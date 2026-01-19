@@ -45,6 +45,7 @@ function WelcomeContent() {
     const [latestRecharge, setLatestRecharge] = useState<any>(null);
     const [showNotifPanel, setShowNotifPanel] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     // VIP Celebration State
     const [showVipCeleb, setShowVipCeleb] = useState(false);
@@ -115,9 +116,13 @@ function WelcomeContent() {
             setUserNotifs(limitedNotifs);
 
             // Sync unread dot with actual unread notifications
-            const hasAnyUnread = limitedNotifs.some((n: any) => !n.read);
+            const unreadNotifs = limitedNotifs.filter((n: any) => !n.read);
+            const hasAnyUnread = unreadNotifs.length > 0;
             if (hasAnyUnread) {
                 setHasUnread(true);
+                setUnreadCount(unreadNotifs.length);
+            } else {
+                setUnreadCount(0);
             }
 
             // --- Auto-Cleanup Logic ---
@@ -308,8 +313,10 @@ function WelcomeContent() {
                             className="w-11 h-11 flex items-center justify-center rounded-2xl bg-[#F5E6D3]/10 border border-[#F5E6D3]/20 relative hover:bg-[#F5E6D3]/20 transition-all active:scale-95"
                         >
                             <Bell size={20} className="text-[#F5E6D3]" />
-                            {hasUnread && (
-                                <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#F5E6D3] border-2 border-[#7B3F00] rounded-full"></span>
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 flex items-center justify-center bg-[#F5E6D3] text-black text-[10px] font-black rounded-full border-2 border-[#7B3F00]">
+                                    {unreadCount > 99 ? '99+' : unreadCount}
+                                </span>
                             )}
                         </button>
 
@@ -371,7 +378,7 @@ function WelcomeContent() {
                         {/* Elite Banner Section - Vertical Slider Redesign */}
                         {banners.length > 0 && (
                             <section className="relative">
-                                <div className="w-full aspect-[1.3/1] rounded-b-[3.5rem] overflow-hidden shadow-2xl shadow-black/40 bg-[#7B3F00] relative">
+                                <div className="w-full aspect-[2/1] overflow-hidden bg-[#7B3F00] relative">
                                     <div
                                         className="flex flex-col h-full"
                                         style={{
@@ -393,48 +400,32 @@ function WelcomeContent() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Decorative Wave Overlay */}
+                                    <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none">
+                                        <svg className="relative block w-full h-[60px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                                            <path d="M0,0 C150,80 350,80 600,40 C850,0 1050,0 1200,40 L1200,120 L0,120 Z" fill="#000000" opacity="0.9"></path>
+                                            <path d="M0,20 C200,100 400,100 600,60 C800,20 1000,20 1200,60 L1200,120 L0,120 Z" fill="#000000" opacity="0.6"></path>
+                                            <path d="M0,40 C250,120 450,120 600,80 C750,40 950,40 1200,80 L1200,120 L0,120 Z" fill="#7B3F00"></path>
+                                        </svg>
+                                    </div>
                                 </div>
                             </section>
                         )}
 
                         {/* Content Wrap with original padding */}
-                        <div className="px-6 space-y-8">
-                            {/* Marquee - Optimized for luxury feel */}
-                            {notifications.length > 0 && (
-                                <div className="bg-white/5 backdrop-blur-md rounded-2xl py-3 border border-white/10 overflow-hidden relative">
-                                    <div className="flex marquee-container gap-12 whitespace-nowrap animate-horizontal-scroll px-4">
-                                        {[...notifications, ...notifications].map((notif, i) => (
-                                            <div key={i} className="flex items-center gap-2">
-                                                <div className="w-1 h-1 bg-[#F5E6D3] rounded-full"></div>
-                                                <span className="text-[10px] font-black text-[#F5E6D3]/70 uppercase tracking-widest">{notif.text}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                        <div className="px-6 space-y-4">
+
 
                             {/* Interactive Action Grid */}
                             <section className="space-y-6 pt-2">
                                 <div className="flex items-center justify-between px-2">
-                                    <h3 className="text-[11px] font-black text-[#F5E6D3] uppercase tracking-[0.25em]">Quick Actions</h3>
+                                    <h3 className="text-[11px] font-black text-[#F5E6D3] uppercase tracking-[0.25em]">Wallets</h3>
                                     <div className="h-px flex-1 mx-4 bg-white/10"></div>
                                     <Star size={12} className="text-[#F5E6D3]" />
                                 </div>
 
-                                {/* Main CTA: Invitation */}
-                                <motion.div
-                                    onClick={() => router.push("/users/invite")}
-                                    whileTap={{ scale: 0.97 }}
-                                    className="relative w-full h-44 rounded-[3rem] overflow-hidden cursor-pointer shadow-2xl shadow-black/40 border border-white/10 group"
-                                >
-                                    <img src="/invite_banner.png" alt="Invite" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                                    <div className="absolute bottom-0 left-0 right-0 p-8 pt-0 flex flex-col items-start justify-end h-full">
-                                        <span className="bg-[#F5E6D3] px-4 py-1.5 rounded-full text-[9px] font-black text-[#3E2723] uppercase tracking-widest mb-3 shadow-lg">Invite</span>
-                                        <h2 className="text-2xl font-black text-white leading-none tracking-tight">Invite Friends</h2>
-                                        <p className="text-[10px] text-white/70 font-bold mt-2 uppercase tracking-wide">Grow your network together</p>
-                                    </div>
-                                </motion.div>
+
 
                                 {/* Modern Bento Hub - Dark Premium Redesign */}
                                 <div className="grid grid-cols-6 gap-4 auto-rows-fr">
@@ -466,23 +457,23 @@ function WelcomeContent() {
                                             <Coins size={24} strokeWidth={2.5} />
                                         </div>
                                         <div className="flex flex-col items-start">
-                                            <span className="text-[10px] font-black text-[#F5E6D3]/60 uppercase tracking-widest leading-none mb-1">Exchange</span>
-                                            <span className="text-sm font-black text-[#F5E6D3] tracking-tight">CASH OUT</span>
+                                            <span className="text-[10px] font-black text-[#F5E6D3]/60 uppercase tracking-widest leading-none mb-1">Wallet</span>
+                                            <span className="text-sm font-black text-[#F5E6D3] tracking-tight">WITHDRAW</span>
                                         </div>
                                         <div className="absolute top-0 right-0 w-24 h-24 bg-[#F5E6D3]/5 rounded-full blur-3xl -mr-8 -mt-8"></div>
                                     </motion.button>
 
-                                    {/* Secondary Action: Collections (Compact Bento) */}
+                                    {/* Secondary Action: Invite (Compact Bento) */}
                                     <motion.button
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
-                                        onClick={() => router.push("/users/product")}
+                                        onClick={() => router.push("/users/invite")}
                                         className="col-span-2 row-span-1 bg-[#7B3F00] backdrop-blur-xl rounded-3xl p-4 flex flex-col items-center justify-center gap-3 border border-[#F5E6D3]/10 group px-2 hover:bg-[#7B3F00]/80 transition-all shadow-2xl shadow-black/40"
                                     >
                                         <div className="w-10 h-10 rounded-xl bg-[#F5E6D3]/10 flex items-center justify-center text-[#F5E6D3] group-hover:rotate-12 transition-transform">
-                                            <Package size={20} strokeWidth={2.5} />
+                                            <Users size={20} strokeWidth={2.5} />
                                         </div>
-                                        <span className="text-[9px] font-black text-[#F5E6D3] uppercase tracking-tighter">PRODUCTS</span>
+                                        <span className="text-[9px] font-black text-[#F5E6D3] uppercase tracking-tighter">INVITE</span>
                                     </motion.button>
 
                                     {/* Secondary Action: VIP Rules (Compact Bento) */}
