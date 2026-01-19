@@ -27,7 +27,8 @@ import {
     Crown,
     PartyPopper,
     BarChart3,
-    Users
+    Users,
+    CreditCard
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -101,6 +102,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { id: "daily-tasks", label: "Daily Tasks", icon: Gamepad2, path: "/admin/daily-tasks" },
         { id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" },
         { id: "users", label: "Users", icon: Users, path: "/admin/users" },
+        { id: "recharge-users", label: "Recharge Users", icon: CreditCard, path: "/admin/recharge-users" },
     ];
 
     const handleLogout = async () => {
