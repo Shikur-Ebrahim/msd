@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot, updateDoc, increment } from "firebase/firestore";
@@ -20,9 +20,12 @@ import {
     RotateCw,
     Info,
     Sparkles,
-    HandMetal
+    HandMetal,
+    ArrowRight,
+    Wallet
 } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Task {
     id: string;
@@ -39,21 +42,21 @@ interface Task {
 }
 
 const DEFAULT_TASKS: Task[] = [
-    { id: 'spin_wheel', name: 'Lucky Spin', type: 'spin', reward_type: 'random', reward_value: { min: 5, max: 100 }, daily_limit: 5, is_active: true, icon: '🎡', color: 'from-purple-500 to-indigo-600', accent: 'bg-purple-100 text-purple-600', description: 'Spin the wheel and test your luck!' },
-    { id: 'scratch_card', name: 'Magic Scratch', type: 'scratch', reward_type: 'random', reward_value: { min: 10, max: 150 }, daily_limit: 3, is_active: true, icon: '🃏', color: 'from-emerald-400 to-teal-600', accent: 'bg-emerald-100 text-emerald-600', description: 'Scratch to reveal your hidden treasure.' },
-    { id: 'mini_quiz', name: 'Brain IQ', type: 'quiz', reward_type: 'fixed', reward_value: 20, daily_limit: 10, is_active: true, icon: '🧠', color: 'from-amber-400 to-orange-600', accent: 'bg-amber-100 text-amber-600', description: 'Answer correctly to win instant rewards.' },
-    { id: 'memory_card', name: 'Memory Match', type: 'memory', reward_type: 'random', reward_value: { min: 15, max: 200 }, daily_limit: 3, is_active: true, icon: '🧩', color: 'from-rose-500 to-pink-600', accent: 'bg-rose-100 text-rose-600', description: 'Match the symbols to claim the prize.' },
-    { id: 'daily_checklist', name: 'Daily Check', type: 'checklist', reward_type: 'fixed', reward_value: 50, daily_limit: 1, is_active: true, icon: '📅', color: 'from-blue-400 to-sky-600', accent: 'bg-blue-100 text-blue-600', description: 'Sign in daily to claim your bonus.' },
-    { id: 'word_scramble', name: 'Word Master', type: 'word', reward_type: 'fixed', reward_value: 30, daily_limit: 5, is_active: true, icon: '📚', color: 'from-violet-500 to-fuchsia-600', accent: 'bg-violet-100 text-violet-600', description: 'Unscramble the word to earn stars.' },
-    { id: 'math_rush', name: 'Math Rush', type: 'math', reward_type: 'random', reward_value: { min: 20, max: 80 }, daily_limit: 10, is_active: true, icon: '➕', color: 'from-cyan-500 to-blue-600', accent: 'bg-cyan-100 text-cyan-600', description: 'Solve quick math problems.' },
-    { id: 'treasure_hunt', name: 'Vault Hunt', type: 'treasure', reward_type: 'random', reward_value: { min: 50, max: 500 }, daily_limit: 2, is_active: true, icon: '💎', color: 'from-yellow-400 to-yellow-600', accent: 'bg-yellow-100 text-yellow-600', description: 'Pick a chest to find hidden stars.' },
-    { id: 'coin_flip', name: 'Flip N Win', type: 'coin', reward_type: 'fixed', reward_value: 15, daily_limit: 15, is_active: true, icon: '🪙', color: 'from-zinc-400 to-zinc-600', accent: 'bg-zinc-100 text-zinc-600', description: 'Guess Head or Tail for stars.' },
-    { id: 'rps_battle', name: 'RPS Battle', type: 'rps', reward_type: 'fixed', reward_value: 25, daily_limit: 10, is_active: true, icon: '✂️', color: 'from-red-500 to-orange-600', accent: 'bg-red-100 text-red-600', description: 'Win Rock Paper Scissors vs AI.' },
-    { id: 'number_guess', name: 'Number Guru', type: 'guess', reward_type: 'random', reward_value: { min: 10, max: 100 }, daily_limit: 8, is_active: true, icon: '🔢', color: 'from-lime-400 to-lime-600', accent: 'bg-lime-100 text-lime-600', description: 'Guess the lucky number from 1-10.' },
-    { id: 'color_tap', name: 'Color Dash', type: 'color', reward_type: 'fixed', reward_value: 20, daily_limit: 12, is_active: true, icon: '🎨', color: 'from-pink-400 to-rose-500', accent: 'bg-pink-100 text-pink-600', description: 'Tap the color that matches the prompt.' },
-    { id: 'fast_clicker', name: 'Fast Tap', type: 'clicker', reward_type: 'random', reward_value: { min: 5, max: 150 }, daily_limit: 5, is_active: true, icon: '⚡', color: 'from-orange-400 to-red-500', accent: 'bg-orange-100 text-orange-600', description: 'Tap as fast as you can!' },
-    { id: 'dice_roller', name: 'Lucky Dice', type: 'dice', reward_type: 'random', reward_value: { min: 10, max: 120 }, daily_limit: 7, is_active: true, icon: '🎲', color: 'from-blue-500 to-indigo-600', accent: 'bg-blue-100 text-blue-600', description: 'Roll the dice for star rewards.' },
-    { id: 'slot_machine', name: 'Star Slots', type: 'slots', reward_type: 'random', reward_value: { min: 10, max: 1000 }, daily_limit: 3, is_active: true, icon: '🎰', color: 'from-purple-600 to-pink-500', accent: 'bg-purple-100 text-purple-600', description: 'Spin the slots for a huge jackpot!' }
+    { id: 'spin_wheel', name: 'Lucky Spin', type: 'spin', reward_type: 'random', reward_value: { min: 5, max: 100 }, daily_limit: 5, is_active: true, icon: '🎡', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Spin the golden wheel for instant stars.' },
+    { id: 'scratch_card', name: 'Magic Scratch', type: 'scratch', reward_type: 'random', reward_value: { min: 10, max: 150 }, daily_limit: 3, is_active: true, icon: '🃏', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Scratch and reveal your hidden treasure.' },
+    { id: 'mini_quiz', name: 'Brain IQ', type: 'quiz', reward_type: 'fixed', reward_value: 20, daily_limit: 10, is_active: true, icon: '🧠', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Answer correctly to win instant rewards.' },
+    { id: 'memory_card', name: 'Memory Match', type: 'memory', reward_type: 'random', reward_value: { min: 15, max: 200 }, daily_limit: 3, is_active: true, icon: '🧩', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Match the symbols to claim the prize.' },
+    { id: 'daily_checklist', name: 'Daily Check', type: 'checklist', reward_type: 'fixed', reward_value: 50, daily_limit: 1, is_active: true, icon: '📅', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Sign in daily to claim your bonus.' },
+    { id: 'word_scramble', name: 'Word Master', type: 'word', reward_type: 'fixed', reward_value: 30, daily_limit: 5, is_active: true, icon: '📚', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Unscramble the word to earn stars.' },
+    { id: 'math_rush', name: 'Math Rush', type: 'math', reward_type: 'random', reward_value: { min: 20, max: 80 }, daily_limit: 10, is_active: true, icon: '➕', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Solve quick math problems.' },
+    { id: 'treasure_hunt', name: 'Vault Hunt', type: 'treasure', reward_type: 'random', reward_value: { min: 50, max: 500 }, daily_limit: 2, is_active: true, icon: '💎', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Pick a chest to find hidden stars.' },
+    { id: 'coin_flip', name: 'Flip N Win', type: 'coin', reward_type: 'fixed', reward_value: 15, daily_limit: 15, is_active: true, icon: '🪙', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Guess Head or Tail for stars.' },
+    { id: 'rps_battle', name: 'RPS Battle', type: 'rps', reward_type: 'fixed', reward_value: 25, daily_limit: 10, is_active: true, icon: '✂️', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Win Rock Paper Scissors vs AI.' },
+    { id: 'number_guess', name: 'Number Guru', type: 'guess', reward_type: 'random', reward_value: { min: 10, max: 100 }, daily_limit: 8, is_active: true, icon: '🔢', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Guess the lucky number from 1-10.' },
+    { id: 'color_tap', name: 'Color Dash', type: 'color', reward_type: 'fixed', reward_value: 20, daily_limit: 12, is_active: true, icon: '🎨', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Tap the color that matches the prompt.' },
+    { id: 'fast_clicker', name: 'Fast Tap', type: 'clicker', reward_type: 'random', reward_value: { min: 5, max: 150 }, daily_limit: 5, is_active: true, icon: '⚡', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Tap as fast as you can!' },
+    { id: 'dice_roller', name: 'Lucky Dice', type: 'dice', reward_type: 'random', reward_value: { min: 10, max: 120 }, daily_limit: 7, is_active: true, icon: '🎲', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Roll the dice for star rewards.' },
+    { id: 'slot_machine', name: 'Star Slots', type: 'slots', reward_type: 'random', reward_value: { min: 10, max: 1000 }, daily_limit: 3, is_active: true, icon: '🎰', color: 'from-[#D4AF37] to-[#AA8B24]', accent: 'bg-[#D4AF37]/10 text-[#D4AF37]', description: 'Spin the slots for a huge jackpot!' }
 ];
 
 // --- Mini Game Components ---
@@ -73,48 +76,45 @@ const SpinWheel = ({ config, onComplete }: { config: Task, onComplete: (reward: 
     const spin = () => {
         if (spinning) return;
         setSpinning(true);
-        const extraDegrees = Math.floor(Math.random() * 360) + 2160; // 6 full rotations
+        const extraDegrees = Math.floor(Math.random() * 360) + 2160;
         const newRotation = rotation + extraDegrees;
         setRotation(newRotation);
 
         setTimeout(() => {
             setSpinning(false);
             const actualRotation = newRotation % 360;
-            // Indicator is at top (270deg). We want to find which sector is there.
-            // Sectors are i*45deg. At 0 rotation, sector 6 (6*45=270) is at top.
-            // As rotation increases (clockwise), wedges move from 5->4->3...
             const winningIndex = (6 - Math.round(actualRotation / 45) % 8 + 8) % 8;
             onComplete(sectors[winningIndex]);
         }, 3000);
     };
 
     return (
-        <div className="flex flex-col items-center gap-8 py-4">
-            <div className="relative w-64 h-64">
-                <div className="absolute top-0 left-1/2 -ml-3 -mt-4 w-6 h-8 bg-red-500 z-20 clip-path-triangle shadow-lg"></div>
-                <div className="w-full h-full rounded-full border-8 border-slate-900 shadow-2xl relative overflow-hidden transition-transform duration-[3000ms] cubic-bezier(0.13, 0.99, 0.3, 1)" style={{ transform: `rotate(${rotation}deg)` }}>
+        <div className="flex flex-col items-center gap-10 py-6">
+            <div className="relative w-72 h-72">
+                <div className="absolute top-0 left-1/2 -ml-3.5 -mt-6 w-7 h-10 bg-[#D4AF37] z-30 clip-path-triangle shadow-[0_4px_10px_rgba(212,175,55,0.4)]"></div>
+                <div className="w-full h-full rounded-full border-[10px] border-[#1A1A1A] shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden transition-transform duration-[3000ms] cubic-bezier(0.13, 0.99, 0.3, 1) ring-1 ring-[#D4AF37]/20" style={{ transform: `rotate(${rotation}deg)` }}>
                     {sectors.map((val, i) => (
                         <div
                             key={i}
-                            className="absolute top-0 left-1/2 w-1/2 h-full origin-left flex items-center justify-end pr-10"
+                            className="absolute top-0 left-1/2 w-1/2 h-full origin-left flex items-center justify-end pr-12"
                             style={{
                                 transform: `rotate(${i * 45}deg)`,
-                                backgroundColor: i % 2 === 0 ? '#fafafa' : '#f0f4f8'
+                                backgroundColor: i % 2 === 0 ? '#0A0A0A' : '#141414'
                             }}
                         >
-                            <div className="flex flex-col items-center justify-center transform -rotate-90 translate-x-4">
-                                <span className="text-[10px] font-black text-slate-900 leading-none">{val}</span>
-                                <Star size={8} className="text-amber-400 mt-0.5" fill="currentColor" />
+                            <div className="flex flex-col items-center justify-center transform -rotate-90 translate-x-6">
+                                <span className="text-[12px] font-black text-[#D4AF37] leading-none mb-1">{val}</span>
+                                <Star size={10} className="text-[#D4AF37]" fill="currentColor" />
                             </div>
                         </div>
                     ))}
                 </div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-slate-900 rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10">
-                    <Star size={20} className="text-amber-400 fill-amber-400" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[#1A1A1A] rounded-full border-4 border-[#D4AF37] shadow-2xl flex items-center justify-center z-20">
+                    <Star size={24} className="text-[#D4AF37] fill-[#D4AF37]" />
                 </div>
             </div>
-            <button onClick={spin} disabled={spinning} className={`px-12 py-4 rounded-2xl font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${spinning ? 'bg-slate-100 text-slate-400' : 'bg-slate-900 text-white shadow-slate-200'}`}>
-                {spinning ? 'Spinning...' : 'Spin Now'}
+            <button onClick={spin} disabled={spinning} className={`w-full py-5 rounded-[2rem] font-black uppercase tracking-[0.4em] transition-all shadow-2xl active:scale-95 text-xs ${spinning ? 'bg-slate-800 text-slate-500' : 'bg-[#D4AF37] text-black shadow-[#D4AF37]/20'}`}>
+                {spinning ? 'Spinning...' : 'Run Protocol'}
             </button>
         </div>
     );
@@ -135,9 +135,9 @@ const ScratchCard = ({ config, onComplete }: { config: Task, onComplete: (reward
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#94a3b8'; for (let i = 0; i < 1000; i++) ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1);
-        ctx.font = 'bold 16px sans-serif'; ctx.fillStyle = '#475569'; ctx.textAlign = 'center'; ctx.fillText('SCRATCH HERE', canvas.width / 2, canvas.height / 2 + 6);
+        ctx.fillStyle = '#1A1A1A'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#D4AF3733'; for (let i = 0; i < 500; i++) ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
+        ctx.font = 'black 12px sans-serif'; ctx.fillStyle = '#D4AF37'; ctx.textAlign = 'center'; ctx.fillText('SCRATCH TO REVEAL', canvas.width / 2, canvas.height / 2 + 5);
     }, []);
 
     const scratch = (e: any) => {
@@ -149,54 +149,57 @@ const ScratchCard = ({ config, onComplete }: { config: Task, onComplete: (reward
         const rect = canvas.getBoundingClientRect();
         const x = ((e.clientX || (e.touches && e.touches[0].clientX)) - rect.left);
         const y = ((e.clientY || (e.touches && e.touches[0].clientY)) - rect.top);
-        ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+        ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI * 2); ctx.fill();
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         let clearPixels = 0; for (let i = 3; i < imageData.data.length; i += 4) if (imageData.data[i] === 0) clearPixels++;
-        if (clearPixels > (canvas.width * canvas.height) * 0.4) {
+        if (clearPixels > (canvas.width * canvas.height) * 0.45) {
             setScratched(true);
             setTimeout(() => onComplete(reward), 1000);
         }
     };
 
     return (
-        <div className="flex flex-col items-center gap-6 py-4">
-            <div className="relative w-64 h-40 rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-900">
-                <div className="absolute inset-0 bg-white flex flex-col items-center justify-center gap-2">
-                    <Trophy size={48} className="text-amber-500 animate-bounce" />
-                    <span className="text-2xl font-black text-slate-900">{reward} STAR</span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">You Won!</span>
+        <div className="flex flex-col items-center gap-8 py-6">
+            <div className="relative w-full aspect-video rounded-[2.5rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border-2 border-[#D4AF37]/20">
+                <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-4">
+                    <Trophy size={56} className="text-[#D4AF37] animate-bounce" />
+                    <div className="text-center">
+                        <span className="text-4xl font-black text-white tracking-tighter tabular-nums">{reward}</span>
+                        <span className="text-xs font-black text-[#D4AF37] ml-2 uppercase tracking-widest">Stars</span>
+                    </div>
                 </div>
-                <canvas ref={canvasRef} width={256} height={160} className="absolute inset-0 cursor-crosshair touch-none" onMouseDown={() => setIsDrawing(true)} onMouseUp={() => setIsDrawing(false)} onMouseMove={(e) => isDrawing && scratch(e)} onTouchStart={() => setIsDrawing(true)} onTouchEnd={() => setIsDrawing(false)} onTouchMove={(e) => isDrawing && scratch(e)} />
+                <canvas ref={canvasRef} width={400} height={225} className="absolute inset-0 cursor-crosshair touch-none mix-blend-normal" onMouseDown={() => setIsDrawing(true)} onMouseUp={() => setIsDrawing(false)} onMouseMove={(e) => isDrawing && scratch(e)} onTouchStart={() => setIsDrawing(true)} onTouchEnd={() => setIsDrawing(false)} onTouchMove={(e) => isDrawing && scratch(e)} />
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Scratch to reveal Stars</p>
+            <p className="text-[10px] font-black text-[#D4AF37]/40 uppercase tracking-[0.4em] animate-pulse">Manual Decryption in Progress</p>
         </div>
     );
 };
 
 const MiniQuiz = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
-    const questions = [{ q: "What is 25 + 75?", a: "100", o: ["90", "100", "110", "120"] }, { q: "Which color is usually for profit?", a: "Green", o: ["Red", "Blue", "Green", "Yellow"] }, { q: "What is 10 x 10?", a: "100", o: ["10", "100", "1000", "50"] }, { q: "How many hours in a day?", a: "24", o: ["12", "24", "48", "6"] }];
+    const questions = [
+        { q: "What is 25 + 75?", a: "100", o: ["90", "100", "110", "120"] },
+        { q: "The 'Golden Ratio' is around?", a: "1.618", o: ["1.414", "1.618", "3.141", "2.718"] },
+        { q: "Wealth asset 'XAU' is?", a: "Gold", o: ["Silver", "Gold", "Oil", "Zen"] },
+        { q: "Zen protocol uses?", a: "Stars", o: ["Coins", "Tokens", "Stars", "Credits"] }
+    ];
     const [currentQ] = useState(questions[Math.floor(Math.random() * questions.length)]);
     const [selected, setSelected] = useState<string | null>(null);
-    const reward = useState(() => {
-        if (config.reward_type === 'fixed') return config.reward_value as number;
-        const { min, max } = config.reward_value as { min: number; max: number };
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    })[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     const checkAnswer = (opt: string) => {
         if (selected) return; setSelected(opt);
         if (opt === currentQ.a) setTimeout(() => onComplete(reward), 1000);
-        else { toast.error("Oops! Wrong answer."); setTimeout(() => onComplete(0), 1000); }
+        else { toast.error("ACCESS_DENIED"); setTimeout(() => onComplete(0), 1000); }
     };
 
     return (
-        <div className="flex flex-col gap-6 py-4 w-full">
-            <div className="bg-slate-50 rounded-3xl p-8 text-center border-2 border-slate-100 shadow-inner">
-                <h4 className="text-xl font-black text-slate-900 leading-tight">{currentQ.q}</h4>
+        <div className="flex flex-col gap-8 py-6 w-full">
+            <div className="bg-[#1A1A1A] rounded-[2rem] p-10 text-center border border-[#D4AF37]/10 shadow-inner">
+                <h4 className="text-2xl font-black text-white italic tracking-tighter leading-tight uppercase">{currentQ.q}</h4>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {currentQ.o.map((opt) => (
-                    <button key={opt} onClick={() => checkAnswer(opt)} className={`p-5 rounded-2xl font-black transition-all border-2 active:scale-95 ${selected === opt ? opt === currentQ.a ? 'bg-emerald-500 border-emerald-600 text-white shadow-emerald-200' : 'bg-red-500 border-red-600 text-white' : 'bg-white border-slate-100 text-slate-700 hover:border-indigo-200'}`}>
+                    <button key={opt} onClick={() => checkAnswer(opt)} className={`p-6 rounded-2xl font-black uppercase tracking-[0.2em] transition-all border-2 active:scale-98 text-xs ${selected === opt ? opt === currentQ.a ? 'bg-[#D4AF37] border-[#D4AF37] text-black' : 'bg-red-500/10 border-red-500 text-red-500' : 'bg-black border-white/5 text-white/40 hover:border-[#D4AF37]/30 hover:text-white'}`}>
                         {opt}
                     </button>
                 ))}
@@ -206,15 +209,11 @@ const MiniQuiz = ({ config, onComplete }: { config: Task, onComplete: (reward: n
 };
 
 const MemoryGame = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
-    const icons = ['🔥', '💎', '🚀', '🌈'];
+    const icons = ['🔥', '💎', '🚀', '👑'];
     const [cards, setCards] = useState(() => [...icons, ...icons].sort(() => Math.random() - 0.5));
     const [flipped, setFlipped] = useState<number[]>([]);
     const [solved, setSolved] = useState<number[]>([]);
-    const reward = useState(() => {
-        if (config.reward_type === 'fixed') return config.reward_value as number;
-        const { min, max } = config.reward_value as { min: number; max: number };
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    })[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     const handleFlip = (i: number) => {
         if (flipped.length === 2 || solved.includes(i) || flipped.includes(i)) return;
@@ -231,10 +230,14 @@ const MemoryGame = ({ config, onComplete }: { config: Task, onComplete: (reward:
     };
 
     return (
-        <div className="grid grid-cols-4 gap-3 py-4">
+        <div className="grid grid-cols-2 gap-6 py-6 max-w-[280px] mx-auto">
             {cards.map((icon, i) => (
-                <button key={i} onClick={() => handleFlip(i)} className={`aspect-square rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 transform active:scale-90 ${flipped.includes(i) || solved.includes(i) ? 'bg-white shadow-lg rotate-0' : 'bg-slate-900 text-transparent rotate-180'}`}>
-                    {(flipped.includes(i) || solved.includes(i)) ? icon : '?'}
+                <button
+                    key={i}
+                    onClick={() => handleFlip(i)}
+                    className={`aspect-square rounded-[2rem] flex items-center justify-center text-4xl transition-all duration-500 transform active:scale-90 border-2 ${flipped.includes(i) || solved.includes(i) ? 'bg-[#D4AF37] border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.3)] rotate-0' : 'bg-black border-white/10 rotate-180'}`}
+                >
+                    {(flipped.includes(i) || solved.includes(i)) ? icon : <Star className="text-white/10" size={24} />}
                 </button>
             ))}
         </div>
@@ -242,7 +245,7 @@ const MemoryGame = ({ config, onComplete }: { config: Task, onComplete: (reward:
 };
 
 const WordMaster = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
-    const words = ["ZEN", "STARS", "FORTUNE", "CRYPTO", "ELITE"];
+    const words = ["GOLD", "VAULT", "STARS", "FORTUNE", "ELITE"];
     const [word] = useState(() => words[Math.floor(Math.random() * words.length)]);
     const [scrambled] = useState(() => word.split('').sort(() => Math.random() - 0.5).join(''));
     const [guess, setGuess] = useState("");
@@ -250,14 +253,14 @@ const WordMaster = ({ config, onComplete }: { config: Task, onComplete: (reward:
 
     const check = () => {
         if (guess.toUpperCase() === word) onComplete(reward);
-        else toast.error("Incorrect word!");
+        else toast.error("DECRYPTION_FAILED");
     };
 
     return (
-        <div className="flex flex-col items-center gap-6 py-4">
-            <div className="bg-slate-50 p-6 rounded-3xl border-2 border-slate-100 text-3xl font-black tracking-[0.5em] text-slate-900">{scrambled}</div>
-            <input value={guess} onChange={(e) => setGuess(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center font-bold outline-none focus:border-indigo-500" placeholder="Type the word..." />
-            <button onClick={check} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase">Verify Word</button>
+        <div className="flex flex-col items-center gap-8 py-6">
+            <div className="bg-[#1A1A1A] px-10 py-8 rounded-[2rem] border border-[#D4AF37]/20 text-4xl font-black tracking-[0.6em] text-[#D4AF37] shadow-inner mb-4 italic truncate max-w-full text-center">{scrambled}</div>
+            <input value={guess} onChange={(e) => setGuess(e.target.value)} className="w-full bg-black border-2 border-white/10 rounded-2xl p-6 text-center font-black text-xl text-white outline-none focus:border-[#D4AF37] transition-all uppercase tracking-widest placeholder:text-white/5" placeholder="DECIPHER..." />
+            <button onClick={check} className="w-full py-6 bg-[#D4AF37] text-black rounded-3xl font-black uppercase tracking-[0.4em] text-xs shadow-2xl active:scale-[0.98]">Confirm Sequence</button>
         </div>
     );
 };
@@ -266,28 +269,30 @@ const MathRush = ({ config, onComplete }: { config: Task, onComplete: (reward: n
     const [num1] = useState(Math.floor(Math.random() * 50) + 1);
     const [num2] = useState(Math.floor(Math.random() * 50) + 1);
     const [ans, setAns] = useState("");
-    const reward = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : Math.floor(Math.random() * ((config.reward_value as any).max - (config.reward_value as any).min)) + (config.reward_value as any).min)[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     const check = () => {
         if (parseInt(ans) === num1 + num2) onComplete(reward);
-        else toast.error("Wrong calculation!");
+        else toast.error("CALCULATION_ERROR");
     };
 
     return (
-        <div className="flex flex-col items-center gap-6 py-4">
-            <div className="text-4xl font-black text-slate-900">{num1} + {num2} = ?</div>
-            <input type="number" value={ans} onChange={(e) => setAns(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center font-bold outline-none" placeholder="Your answer" />
-            <button onClick={check} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest">Submit Result</button>
+        <div className="flex flex-col items-center gap-8 py-6">
+            <div className="text-5xl font-black text-white italic tracking-tighter">{num1} <span className="text-[#D4AF37]">+</span> {num2}</div>
+            <input type="number" value={ans} onChange={(e) => setAns(e.target.value)} className="w-full bg-black border-2 border-white/10 rounded-2xl p-6 text-center font-black text-2xl text-white outline-none focus:border-[#D4AF37] transition-all" placeholder="RESULT" />
+            <button onClick={check} className="w-full py-6 bg-[#D4AF37] text-black rounded-3xl font-black uppercase tracking-[0.4em] text-xs shadow-2xl active:scale-[0.98]">Validate Entry</button>
         </div>
     );
 };
 
 const TreasureHunt = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
-    const [reward] = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : Math.floor(Math.random() * ((config.reward_value as any).max - (config.reward_value as any).min)) + (config.reward_value as any).min);
+    const [reward] = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min);
     return (
-        <div className="grid grid-cols-3 gap-4 py-8">
+        <div className="grid grid-cols-3 gap-6 py-12">
             {[1, 2, 3].map(i => (
-                <button key={i} onClick={() => onComplete(reward)} className="aspect-square bg-slate-50 rounded-3xl border-2 border-slate-100 flex items-center justify-center text-5xl hover:scale-110 transition-transform active:scale-90">🎁</button>
+                <button key={i} onClick={() => onComplete(reward)} className="aspect-square bg-[#1A1A1A] rounded-[2rem] border-2 border-white/5 flex items-center justify-center text-4xl hover:border-[#D4AF37]/40 hover:bg-black transition-all active:scale-90 shadow-2xl group">
+                    <span className="group-hover:scale-125 transition-transform duration-500">🎁</span>
+                </button>
             ))}
         </div>
     );
@@ -303,9 +308,12 @@ const CoinFlip = ({ config, onComplete }: { config: Task, onComplete: (reward: n
     };
 
     return (
-        <div className="flex flex-col items-center gap-8 py-4">
-            <div className={`w-32 h-32 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 border-4 border-yellow-700 shadow-xl flex items-center justify-center text-5xl text-white font-black ${flipping ? 'animate-bounce' : ''}`}>$</div>
-            <button onClick={flip} disabled={flipping} className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest">Flip Coin</button>
+        <div className="flex flex-col items-center gap-10 py-6">
+            <div className={`w-36 h-36 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#8B6B1A] border-[6px] border-[#3D2E0B] shadow-[0_20px_40px_rgba(0,0,0,0.4)] flex items-center justify-center text-6xl text-black font-black italic relative overflow-hidden ${flipping ? 'animate-[bounce_0.5s_infinite]' : ''}`}>
+                <div className="absolute inset-0 bg-white/20 -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                $
+            </div>
+            <button onClick={flip} disabled={flipping} className="w-full py-6 bg-black text-[#D4AF37] border-2 border-[#D4AF37]/40 rounded-3xl font-black uppercase tracking-[0.5em] text-xs shadow-2xl active:scale-95 transition-all">Strike Coin</button>
         </div>
     );
 };
@@ -316,15 +324,18 @@ const RPSBattle = ({ config, onComplete }: { config: Task, onComplete: (reward: 
 
     const play = (choice: string) => {
         const ai = options[Math.floor(Math.random() * 3)];
-        if (choice === ai) { toast.info(`AI picked ${ai}. Draw!`); onComplete(Math.floor(reward / 2)); }
-        else if ((choice === "ROCK" && ai === "SCISSORS") || (choice === "PAPER" && ai === "ROCK") || (choice === "SCISSORS" && ai === "PAPER")) { toast.success(`AI picked ${ai}. You Won!`); onComplete(reward); }
-        else { toast.error(`AI picked ${ai}. You Lost!`); onComplete(5); }
+        if (choice === ai) onComplete(Math.floor(reward / 2));
+        else if ((choice === "ROCK" && ai === "SCISSORS") || (choice === "PAPER" && ai === "ROCK") || (choice === "SCISSORS" && ai === "PAPER")) onComplete(reward);
+        else onComplete(5);
     };
 
     return (
-        <div className="grid grid-cols-3 gap-3 py-4">
+        <div className="grid grid-cols-1 gap-4 py-6 w-full">
             {["🪨", "📄", "✂️"].map((icon, i) => (
-                <button key={i} onClick={() => play(options[i])} className="aspect-square bg-slate-50 border-2 border-slate-100 rounded-2xl text-4xl flex flex-col items-center justify-center gap-2 hover:bg-white transition-all active:scale-90 shadow-sm"><span className="text-3xl">{icon}</span><span className="text-[8px] font-black">{options[i]}</span></button>
+                <button key={i} onClick={() => play(options[i])} className="w-full py-6 bg-black border border-white/10 rounded-2xl flex items-center justify-between px-10 hover:border-[#D4AF37]/40 hover:bg-[#1A1A1A] transition-all active:scale-[0.98] group">
+                    <span className="text-3xl filter grayscale group-hover:grayscale-0 transition-all">{icon}</span>
+                    <span className="text-xs font-black text-white/40 group-hover:text-[#D4AF37] tracking-[0.4em]">{options[i]}</span>
+                </button>
             ))}
         </div>
     );
@@ -332,28 +343,28 @@ const RPSBattle = ({ config, onComplete }: { config: Task, onComplete: (reward: 
 
 const NumberGuess = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
     const [target] = useState(Math.floor(Math.random() * 10) + 1);
-    const reward = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : Math.floor(Math.random() * ((config.reward_value as any).max - (config.reward_value as any).min)) + (config.reward_value as any).min)[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     return (
-        <div className="grid grid-cols-5 gap-2 py-4">
+        <div className="grid grid-cols-5 gap-3 py-6">
             {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
-                <button key={n} onClick={() => n === target ? onComplete(reward) : toast.error("Try again!")} className="aspect-square bg-slate-50 border-2 border-slate-100 rounded-xl font-black text-slate-700 hover:bg-white active:scale-90">{n}</button>
+                <button key={n} onClick={() => n === target ? onComplete(reward) : toast.error("MISS")} className="aspect-square bg-black border-2 border-white/5 rounded-2xl font-black text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-all active:scale-90">{n}</button>
             ))}
         </div>
     );
 };
 
 const ColorTap = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
-    const colors = ["RED", "BLUE", "GREEN", "YELLOW"];
+    const colors = ["GOLD", "WHITE", "BRONZE", "BLACK"];
     const [target] = useState(colors[Math.floor(Math.random() * 4)]);
     const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     return (
-        <div className="flex flex-col items-center gap-6 py-4">
-            <p className="text-xl font-black text-slate-900">TAP THE <span className="text-indigo-600">{target}</span> CIRCLE</p>
-            <div className="flex gap-4">
+        <div className="flex flex-col items-center gap-8 py-6">
+            <p className="text-lg font-black text-white tracking-[0.2em] uppercase">Target: <span className="text-[#D4AF37]">{target}</span></p>
+            <div className="grid grid-cols-2 gap-6">
                 {colors.map(c => (
-                    <button key={c} onClick={() => c === target ? onComplete(reward) : onComplete(0)} className={`w-14 h-14 rounded-full shadow-lg border-2 border-white transition-transform active:scale-90 ${c === 'RED' ? 'bg-red-500' : c === 'BLUE' ? 'bg-blue-500' : c === 'GREEN' ? 'bg-emerald-500' : 'bg-yellow-400'}`}></button>
+                    <button key={c} onClick={() => c === target ? onComplete(reward) : onComplete(0)} className={`w-20 h-20 rounded-[2rem] shadow-2xl border-4 transition-all active:scale-90 ${c === 'GOLD' ? 'bg-[#D4AF37] border-white/20' : c === 'WHITE' ? 'bg-white border-black/10' : c === 'BRONZE' ? 'bg-[#8B6B1A] border-white/10' : 'bg-black border-white/10'}`}></button>
                 ))}
             </div>
         </div>
@@ -364,20 +375,20 @@ const FastClicker = ({ config, onComplete }: { config: Task, onComplete: (reward
     const [clicks, setClicks] = useState(0);
     const [timer, setTimer] = useState(5);
     const [active, setActive] = useState(false);
-    const reward = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : Math.floor(Math.random() * ((config.reward_value as any).max - (config.reward_value as any).min)) + (config.reward_value as any).min)[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     useEffect(() => {
         let interval: any;
         if (active && timer > 0) interval = setInterval(() => setTimer(t => t - 1), 1000);
-        else if (timer === 0) onComplete(clicks >= 25 ? reward : Math.floor(clicks * 1.5));
+        else if (timer === 0) onComplete(clicks >= 30 ? reward : Math.floor(clicks * 1.2));
         return () => clearInterval(interval);
     }, [active, timer]);
 
     return (
-        <div className="flex flex-col items-center gap-6 py-4">
-            <div className="flex justify-between w-full font-black text-xs text-slate-400 uppercase tracking-widest"><span>Clicks: {clicks}</span><span>Time: {timer}s</span></div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden"><div className="h-full bg-orange-500 transition-all" style={{ width: `${(timer / 5) * 100}%` }}></div></div>
-            <button onClick={() => { if (!active) setActive(true); setClicks(c => c + 1); }} disabled={timer === 0} className="w-32 h-32 rounded-full bg-slate-900 text-white font-black text-2xl shadow-xl active:scale-90 transition-transform">TAP!</button>
+        <div className="flex flex-col items-center gap-10 py-6">
+            <div className="flex justify-between w-full font-black text-[10px] text-[#D4AF37]/50 uppercase tracking-[0.4em]"><span>Load: {clicks}</span><span>Uplink: {timer}s</span></div>
+            <div className="w-full bg-white/5 h-3 rounded-full overflow-hidden border border-white/5"><div className="h-full bg-[#D4AF37] transition-all shadow-[0_0_15px_#D4AF37]" style={{ width: `${(timer / 5) * 100}%` }}></div></div>
+            <button onClick={() => { if (!active) setActive(true); setClicks(c => c + 1); }} disabled={timer === 0} className="w-40 h-40 rounded-full bg-[#D4AF37] text-black font-black text-3xl shadow-[0_0_50px_rgba(212,175,55,0.2)] active:scale-95 transition-all outline-none border-[12px] border-black ring-4 ring-[#D4AF37]/20 uppercase tracking-tighter italic">Tap!</button>
         </div>
     );
 };
@@ -385,7 +396,7 @@ const FastClicker = ({ config, onComplete }: { config: Task, onComplete: (reward
 const DiceRoller = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
     const [rolling, setRolling] = useState(false);
     const [result, setResult] = useState(1);
-    const reward = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : Math.floor(Math.random() * ((config.reward_value as any).max - (config.reward_value as any).min)) + (config.reward_value as any).min)[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).min;
 
     const roll = () => {
         setRolling(true);
@@ -396,40 +407,40 @@ const DiceRoller = ({ config, onComplete }: { config: Task, onComplete: (reward:
     };
 
     return (
-        <div className="flex flex-col items-center gap-8 py-4">
-            <div className={`w-24 h-24 bg-white border-4 border-slate-900 rounded-3xl flex items-center justify-center text-5xl shadow-xl ${rolling ? 'animate-spin' : ''}`}>{result}</div>
-            <button onClick={roll} disabled={rolling} className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest">Roll Lucky Dice</button>
+        <div className="flex flex-col items-center gap-10 py-6">
+            <div className={`w-28 h-28 bg-[#1A1A1A] border-4 border-[#D4AF37] rounded-[2.5rem] flex items-center justify-center text-6xl text-[#D4AF37] shadow-2xl ${rolling ? 'animate-spin' : ''}`}>{result}</div>
+            <button onClick={roll} disabled={rolling} className="w-full py-6 bg-[#D4AF37] text-black rounded-3xl font-black uppercase tracking-[0.5em] text-xs shadow-2xl active:scale-95">Roll Golden Dice</button>
         </div>
     );
 };
 
 const SlotMachine = ({ config, onComplete }: { config: Task, onComplete: (reward: number) => void }) => {
-    const emojis = ['⭐', '💎', '🔥', '👑'];
-    const [slots, setSlots] = useState(['⭐', '⭐', '⭐']);
+    const emojis = ['👑', '💎', '🔥', '⭐'];
+    const [slots, setSlots] = useState(['👑', '👑', '👑']);
     const [rolling, setRolling] = useState(false);
-    const reward = useState(() => config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).max)[0];
+    const reward = config.reward_type === 'fixed' ? config.reward_value as number : (config.reward_value as any).max;
 
     const spin = () => {
         setRolling(true);
-        const interval = setInterval(() => setSlots([emojis[Math.floor(Math.random() * 4)], emojis[Math.floor(Math.random() * 4)], emojis[Math.floor(Math.random() * 4)]]), 100);
+        const interval = setInterval(() => setSlots([emojis[Math.floor(Math.random() * 4)], emojis[Math.floor(Math.random() * 4)], emojis[Math.floor(Math.random() * 4)]]), 80);
         setTimeout(() => {
             clearInterval(interval); setRolling(false);
             const final = [emojis[Math.floor(Math.random() * 4)], emojis[Math.floor(Math.random() * 4)], emojis[Math.floor(Math.random() * 4)]];
             setSlots(final);
             if (final[0] === final[1] && final[1] === final[2]) onComplete(reward);
-            else if (final[0] === final[1] || final[1] === final[2] || final[0] === final[2]) onComplete(Math.floor(reward / 5));
+            else if (final[0] === final[1] || final[1] === final[2] || final[0] === final[2]) onComplete(Math.floor(reward / 10));
             else onComplete(5);
         }, 2000);
     };
 
     return (
-        <div className="flex flex-col items-center gap-8 py-4">
-            <div className="flex gap-4 p-6 bg-slate-900 rounded-3xl shadow-inner">
+        <div className="flex flex-col items-center gap-10 py-6">
+            <div className="flex gap-5 p-8 bg-black rounded-[2.5rem] shadow-2xl border border-white/5">
                 {slots.map((s, i) => (
-                    <div key={i} className="w-16 h-20 bg-white rounded-xl flex items-center justify-center text-3xl shadow-lg">{s}</div>
+                    <div key={i} className="w-16 h-24 bg-[#1A1A1A] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-4xl shadow-lg shadow-black">{s}</div>
                 ))}
             </div>
-            <button onClick={spin} disabled={rolling} className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-purple-200">Pull Lever</button>
+            <button onClick={spin} disabled={rolling} className="w-full py-6 bg-gradient-to-r from-[#AA8B24] via-[#D4AF37] to-[#AA8B24] text-black rounded-3xl font-black uppercase tracking-[0.4em] text-xs shadow-2xl active:scale-95">Pull Lever</button>
         </div>
     );
 };
@@ -488,11 +499,16 @@ export default function TasksPage() {
                 [`task_stats.${key}`]: increment(1)
             });
             toast.success(`Received ${amount} Zen Stars!`, { icon: '✨' });
-        } catch (error) { console.error(error); toast.error("Failed to reward Stars."); }
+        } catch (error) { console.error(error); toast.error("REWARD_UPLINK_FAILURE"); }
         finally { setIsClaiming(false); setActiveTask(null); }
     };
 
-    if (loading) return <div className="min-h-screen flex items-center justify-center bg-white"><Loader2 className="animate-spin text-slate-900" /></div>;
+    if (loading) return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#0A0A0A]">
+            <Loader2 className="w-12 h-12 animate-spin text-[#D4AF37]" />
+            <p className="mt-8 text-[10px] font-black tracking-[0.4em] text-[#D4AF37]/30 uppercase">Initializing Gateway</p>
+        </div>
+    );
 
     const todayStr = new Date().toISOString().split('T')[0];
     const getRemainingPlays = (taskId: string, limit: number) => {
@@ -501,38 +517,107 @@ export default function TasksPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900 select-none font-sans overflow-hidden">
-            <header className="px-6 pt-12 pb-6 flex items-center justify-between bg-white border-b border-slate-100 z-20 shadow-sm">
-                <button onClick={() => router.push("/users/welcome")} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100"><ChevronLeft size={20} /></button>
-                <div className="flex flex-col items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Premium Assets</span><span className="text-xl font-black tracking-tight">Daily Tasks</span></div>
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-indigo-600 border border-slate-100"><Star size={18} fill="currentColor" /></div>
+        <div className="min-h-screen bg-[#0A0A0A] flex flex-col text-white select-none font-sans overflow-hidden">
+            {/* Premium Gold Header */}
+            <header className="px-6 pt-12 pb-8 flex items-center justify-between bg-black border-b border-white/5 z-50">
+                <button onClick={() => router.push("/users/welcome")} className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-all active:scale-90">
+                    <ChevronLeft size={24} strokeWidth={2.5} />
+                </button>
+                <div className="flex flex-col items-center">
+                    <p className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em]">Partner Program</p>
+                    <h1 className="text-xl font-black uppercase tracking-widest italic">Zen.Tasks</h1>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/20">
+                    <Gamepad2 size={24} />
+                </div>
             </header>
 
-            <main className="flex-1 overflow-y-auto px-6 py-6 pb-12 space-y-8 no-scrollbar">
-                <section className="relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl group">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl -mr-24 -mt-24"></div>
-                    <div className="relative z-10 flex flex-col gap-6">
-                        <div className="flex justify-between items-center"><span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Zen Star Wallet</span><Star size={20} className="text-amber-400 fill-amber-400" /></div>
-                        <div className="flex items-baseline gap-2"><span className="text-5xl font-black tracking-tighter">{Number(userData?.stars || 0).toLocaleString()}</span><span className="text-sm font-bold opacity-60 uppercase tracking-widest">Stars</span></div>
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10 uppercase tracking-widest font-black text-[9px]">
-                            <div className="flex flex-col gap-1"><span className="text-slate-500">Status</span><span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={10} /> Active</span></div>
-                            <div className="flex flex-col gap-1"><span className="text-slate-500">Earnings</span><span className="text-amber-400 flex items-center gap-1"><Sparkles size={10} /> Daily Star Rewards</span></div>
+            <main className="flex-1 overflow-y-auto px-6 py-10 pb-20 space-y-12 no-scrollbar relative">
+                {/* Visual Ambient */}
+                <div className="fixed top-32 left-0 w-full h-[500px] bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.03),transparent_70%)] pointer-events-none"></div>
+
+                {/* Star Wallet - Gold Overhaul */}
+                <section className="relative overflow-hidden bg-black rounded-[3rem] p-10 border border-white/5 shadow-2xl group animate-in fade-in slide-in-from-top-6 duration-700">
+                    {/* Metalic Reflection */}
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 via-transparent to-transparent"></div>
+                    <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#D4AF37]/5 rounded-full blur-[100px]"></div>
+
+                    <div className="relative z-10 flex flex-col gap-8">
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <div className="w-1 h-4 bg-[#D4AF37] rounded-full"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#D4AF37]/40">Accumulated Assets</span>
+                            </div>
+                            <Star size={24} className="text-[#D4AF37] fill-[#D4AF37] drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
+                        </div>
+
+                        <div className="flex items-baseline gap-4">
+                            <span className="text-6xl font-black tracking-tighter text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                                {Number(userData?.stars || 0).toLocaleString()}
+                            </span>
+                            <span className="text-xs font-black text-[#D4AF37] uppercase tracking-[0.3em] font-mono italic">Stars</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-8 pt-8 border-t border-white/5">
+                            <div className="space-y-2">
+                                <p className="text-[8px] font-black text-white/20 uppercase tracking-widest">Mining Status</p>
+                                <div className="flex items-center gap-2 text-emerald-400 font-bold text-[11px] uppercase tracking-tighter italic">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    Sync_Stable
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-[8px] font-black text-white/20 uppercase tracking-widest">Premium Level</p>
+                                <div className="flex items-center gap-2 text-[#D4AF37] font-bold text-[11px] uppercase tracking-tighter italic">
+                                    <Sparkles size={12} className="fill-current" />
+                                    Gold_Partner
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <section className="space-y-6">
-                    <div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="w-1.5 h-4 bg-slate-900 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.1)]"></div><h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Available Tasks</h3></div><RefreshCcw size={16} className="text-slate-300" /></div>
+                {/* Tasks Grid */}
+                <section className="space-y-8">
+                    <header className="flex items-center justify-between px-2">
+                        <div className="flex items-center gap-4">
+                            <div className="w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_10px_#D4AF37]"></div>
+                            <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.5em]">Active Circuits</h3>
+                        </div>
+                        <RefreshCcw size={18} className="text-white/10 hover:text-[#D4AF37] transition-colors" />
+                    </header>
+
                     <div className="grid grid-cols-2 gap-5">
                         {tasks.map((task) => {
                             const remaining = getRemainingPlays(task.id, task.daily_limit);
                             const locked = remaining === 0;
                             return (
-                                <button key={task.id} disabled={locked} onClick={() => setActiveTask(task)} className={`relative aspect-[0.9/1] rounded-[2.5rem] p-6 flex flex-col items-center justify-between transition-all duration-300 overflow-hidden ${locked ? 'bg-slate-100 opacity-60 shadow-inner' : 'bg-white shadow-xl shadow-slate-200/40 active:scale-95 group'}`}>
-                                    <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-3xl opacity-[0.05] bg-gradient-to-br ${task.color}`}></div>
-                                    <div className="relative z-10 w-full flex justify-between items-start"><span className={`px-2 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider ${locked ? 'bg-slate-200' : 'bg-slate-50 text-slate-600'}`}>{locked ? 'Completed' : `${remaining} Left`}</span>{locked ? <Lock size={14} className="text-slate-400" /> : <Sparkles size={14} className="text-amber-400 animate-pulse" />}</div>
-                                    <div className="relative z-10 flex flex-col items-center gap-3"><span className="text-4xl filter drop-shadow-lg transform group-hover:scale-125 transition-transform">{task.icon}</span><div className="text-center"><p className="text-xs font-black uppercase tracking-tight">{task.name}</p><p className="text-[9px] font-black text-slate-400 mt-1 uppercase opacity-60">Win Zen Stars</p></div></div>
-                                    <div className={`relative z-10 w-full h-11 rounded-2xl flex items-center justify-center transition-all ${locked ? 'bg-slate-200' : 'bg-slate-900 shadow-lg'}`}>{locked ? <CheckCircle2 size={16} className="text-slate-400" /> : <Play size={14} fill="white" className="text-white" />}</div>
+                                <button
+                                    key={task.id}
+                                    disabled={locked}
+                                    onClick={() => setActiveTask(task)}
+                                    className={`relative aspect-[0.85/1] rounded-[3rem] p-8 flex flex-col items-center justify-between transition-all duration-500 group border overflow-hidden shadow-2xl ${locked ? 'bg-black border-white/5 opacity-40 grayscale pointer-events-none' : 'bg-black border-white/10 active:scale-95 hover:border-[#D4AF37]/40 active:border-[#D4AF37]'}`}
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                                    <div className="relative z-10 w-full flex justify-between items-center">
+                                        <div className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest leading-none ${locked ? 'bg-white/5 text-white/20' : 'bg-[#D4AF37]/10 text-[#D4AF37]'}`}>
+                                            {locked ? 'VOID' : `${remaining}/${task.daily_limit}`}
+                                        </div>
+                                        {locked ? <Lock size={12} className="text-white/20" /> : <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"></div>}
+                                    </div>
+
+                                    <div className="relative z-10 flex flex-col items-center gap-4">
+                                        <span className="text-5xl filter transition-all duration-700 group-hover:scale-125 group-hover:-rotate-12 drop-shadow-2xl">{task.icon}</span>
+                                        <div className="text-center">
+                                            <p className="text-[11px] font-black uppercase tracking-tight text-white mb-1">{task.name}</p>
+                                            <p className="text-[8px] font-black text-[#D4AF37] uppercase tracking-[0.2em] italic opacity-40">Earn Yield</p>
+                                        </div>
+                                    </div>
+
+                                    <div className={`relative z-10 w-full h-12 rounded-2xl flex items-center justify-center transition-all ${locked ? 'bg-white/5' : 'bg-[#1A1A1A] group-hover:bg-[#D4AF37] group-hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] shadow-xl shadow-black'}`}>
+                                        {locked ? <CheckCircle2 size={16} className="text-white/10" /> : <Play size={16} fill="currentColor" className="text-white group-hover:text-black transition-colors" />}
+                                    </div>
                                 </button>
                             );
                         })}
@@ -540,32 +625,89 @@ export default function TasksPage() {
                 </section>
             </main>
 
-            {activeTask && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center bg-slate-900/60 backdrop-blur-md px-6 animate-in fade-in">
-                    <div className="w-full max-w-sm bg-white rounded-[3rem] p-10 relative shadow-2xl animate-in zoom-in-95">
-                        <button onClick={() => setActiveTask(null)} className="absolute top-8 right-8 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"><X size={20} /></button>
-                        <div className="text-center mb-10"><div className={`w-20 h-20 rounded-[2rem] mx-auto mb-6 bg-gradient-to-br ${activeTask.color} flex items-center justify-center text-4xl shadow-xl border-4 border-white`}>{activeTask.icon}</div><h3 className="text-2xl font-black tracking-tight">{activeTask.name}</h3><p className="text-xs font-bold text-slate-400 mt-2">{activeTask.description}</p></div>
-                        <div className="mb-10">
-                            {activeTask.type === 'spin' && <SpinWheel config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'scratch' && <ScratchCard config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'quiz' && <MiniQuiz config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'memory' && <MemoryGame config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'word' && <WordMaster config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'math' && <MathRush config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'treasure' && <TreasureHunt config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'coin' && <CoinFlip config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'rps' && <RPSBattle config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'guess' && <NumberGuess config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'color' && <ColorTap config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'clicker' && <FastClicker config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'dice' && <DiceRoller config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'slots' && <SlotMachine config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
-                            {activeTask.type === 'checklist' && <div className="flex flex-col items-center gap-6"><div className="w-48 h-48 rounded-full bg-slate-50 border-8 border-slate-100 flex flex-col items-center justify-center gap-2 shadow-inner"><HandMetal size={48} className="text-indigo-600 animate-bounce" /><span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ready to Claim</span></div><button onClick={() => claimReward(activeTask.id, (activeTask.reward_value as number) || 50)} className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest shadow-xl active:scale-95">Collect Zen Stars</button></div>}
+            {/* Game Modal Overhaul - Dark & Gold */}
+            <AnimatePresence>
+                {activeTask && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[150] flex items-center justify-center bg-black/95 backdrop-blur-2xl px-6"
+                    >
+                        <motion.div
+                            initial={{ y: 50, opacity: 0, scale: 0.9 }}
+                            animate={{ y: 0, opacity: 1, scale: 1 }}
+                            exit={{ y: 50, opacity: 0, scale: 0.8 }}
+                            className="w-full max-w-sm bg-black rounded-[4rem] p-10 relative shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/5"
+                        >
+                            <button onClick={() => setActiveTask(null)} className="absolute top-10 right-10 w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:text-[#D4AF37] transition-all">
+                                <X size={24} strokeWidth={3} />
+                            </button>
+
+                            <div className="text-center flex flex-col items-center mb-10 mt-4">
+                                <div className="w-24 h-24 rounded-[2.5rem] bg-[#1A1A1A] border-2 border-[#D4AF37]/20 flex items-center justify-center text-5xl shadow-2xl mb-8 transform rotate-3">{activeTask.icon}</div>
+                                <h3 className="text-3xl font-black italic tracking-tighter uppercase text-white mb-3 leading-none">{activeTask.name}</h3>
+                                <p className="text-[10px] font-black text-[#D4AF37]/40 uppercase tracking-[0.3em] max-w-[200px] leading-relaxed">{activeTask.description}</p>
+                            </div>
+
+                            <div className="relative">
+                                {activeTask.type === 'spin' && <SpinWheel config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'scratch' && <ScratchCard config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'quiz' && <MiniQuiz config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'memory' && <MemoryGame config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'word' && <WordMaster config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'math' && <MathRush config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'treasure' && <TreasureHunt config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'coin' && <CoinFlip config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'rps' && <RPSBattle config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'guess' && <NumberGuess config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'color' && <ColorTap config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'clicker' && <FastClicker config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'dice' && <DiceRoller config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'slots' && <SlotMachine config={activeTask} onComplete={(r) => claimReward(activeTask.id, r)} />}
+                                {activeTask.type === 'checklist' && <div className="flex flex-col items-center gap-10 py-10"><div className="w-48 h-48 rounded-full bg-black border-[10px] border-[#1A1A1A] flex flex-col items-center justify-center gap-4 shadow-inner relative"><div className="absolute inset-0 bg-[#D4AF37]/5 rounded-full animate-pulse"></div><HandMetal size={64} className="text-[#D4AF37] drop-shadow-[0_0_15px_#D4AF37]" /><span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#D4AF37]/40">Active_Link</span></div><button onClick={() => claimReward(activeTask.id, (activeTask.reward_value as number) || 50)} className="w-full py-6 bg-[#D4AF37] text-black rounded-3xl font-black uppercase tracking-[0.4em] text-xs shadow-2xl active:scale-95 italic">Collect Asset</button></div>}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Claiming Overlay - Premium */}
+            <AnimatePresence>
+                {isClaiming && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-3xl"
+                    >
+                        <div className="flex flex-col items-center gap-8">
+                            <div className="relative">
+                                <RotateCw className="w-16 h-16 animate-spin text-[#D4AF37]" strokeWidth={3} />
+                                <Star size={24} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#D4AF37] fill-[#D4AF37] animate-pulse" />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white italic">Synchronizing Assets...</p>
                         </div>
-                    </div>
-                </div>
-            )}
-            {isClaiming && <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white/90 backdrop-blur-xl animate-in fade-in"><div className="flex flex-col items-center gap-6"><div className="relative"><Loader2 className="w-16 h-16 animate-spin text-slate-900" /><Sparkles size={24} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-amber-500 animate-pulse" /></div><p className="text-sm font-black uppercase tracking-[0.2em] text-slate-900">Collecting Stars...</p></div></div>}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <style jsx global>{`
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%) skewX(-15deg); }
+                    100% { transform: translateX(200%) skewX(-15deg); }
+                }
+                .clip-path-triangle {
+                    clip-path: polygon(50% 100%, 0 0, 100% 0);
+                }
+                ::-webkit-scrollbar {
+                    display: none;
+                }
+                .no-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </div>
     );
 }
