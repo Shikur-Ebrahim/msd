@@ -125,7 +125,7 @@ function PendingContent() {
                 </button>
                 <div className="px-5 py-2.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[11px] font-bold tracking-widest text-indigo-400 shadow-xl backdrop-blur-xl flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                    Zen Secure {searchParams.get('type') === 'withdrawal' ? 'W-72' : 'R-10'}
+                    DPM Secure {searchParams.get('type') === 'withdrawal' ? 'W-72' : 'R-10'}
                 </div>
                 <div className="w-12"></div>
             </header>

@@ -56,8 +56,8 @@ export default function InvitePage() {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Join Zen & Earn!',
-                    text: 'Join me on Zen and get verified rewards!',
+                    title: 'Join DPM & Earn!',
+                    text: 'Join me on DPM and get verified rewards!',
                     url: referralLink,
                 });
             } catch (error) {

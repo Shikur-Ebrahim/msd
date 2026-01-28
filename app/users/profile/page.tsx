@@ -211,7 +211,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-4 gap-4 mb-12">
                     {[
                         { label: "FUND", image: null, color: "blue", iconColor: "text-blue-600", path: "/users/funding-details", dark: false, icon: Wallet },
-                        { label: "DOWNLOAD", image: "/zen-3d-logo-v2.png", color: "indigo", iconColor: "text-white", path: "/users/download", dark: false, icon: null },
+                        { label: "DOWNLOAD", image: "/dpm-logo.png", color: "indigo", iconColor: "text-white", path: "/users/download", dark: false, icon: null },
                         { label: "BANK", image: null, color: "emerald", iconColor: "text-emerald-600", path: "/users/bank", dark: false, icon: Building2 },
                         { label: "SERVICE", image: null, color: "purple", iconColor: "text-purple-600", path: "/users/service", dark: false, icon: Headphones },
                     ].map((item: any, i) => (

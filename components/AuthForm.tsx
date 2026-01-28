@@ -103,7 +103,7 @@ export default function AuthForm() {
 
                 const fullPhoneNumber = `${formData.phonePrefix}${formData.phoneNumber}`;
                 const sanitizedPhone = fullPhoneNumber.replace(/\+/g, "").replace(/\s/g, "");
-                const generatedEmail = `${sanitizedPhone}@zen.app`;
+                const generatedEmail = `${sanitizedPhone}@dpm.app`;
 
                 if (formData.password !== formData.confirmPassword) {
                     throw new Error("Passwords do not match");
@@ -121,10 +121,10 @@ export default function AuthForm() {
 
                 const searchParams = new URLSearchParams(window.location.search);
                 const refParam = searchParams.get("ref");
-                let refCode = refParam || localStorage.getItem("zen_ref");
+                let refCode = refParam || localStorage.getItem("dpm_ref");
 
                 if (refParam) {
-                    localStorage.setItem("zen_ref", refParam);
+                    localStorage.setItem("dpm_ref", refParam);
                 }
 
                 if (refCode) {
@@ -216,7 +216,7 @@ export default function AuthForm() {
                 } else {
                     const fullPhoneNumber = `${formData.phonePrefix}${input}`;
                     const sanitizedPhone = fullPhoneNumber.replace(/\+/g, "").replace(/\s/g, "");
-                    const generatedEmail = `${sanitizedPhone}@zen.app`;
+                    const generatedEmail = `${sanitizedPhone}@dpm.app`;
 
                     userCredential = await signInWithEmailAndPassword(auth, generatedEmail, formData.password);
                 }
@@ -283,86 +283,90 @@ export default function AuthForm() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#f4f4f6]">
-            {/* Subtle Texture/Grain Background */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/baseFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#FAF9F6]">
+            {/* Ambient Background Glows */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-[#C9A24D]/5 blur-[120px] rounded-full"></div>
+                <div className="absolute bottom-[0%] right-[-10%] w-[60%] h-[60%] bg-[#8B5E3C]/5 blur-[100px] rounded-full"></div>
+            </div>
 
             <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="w-full max-w-[480px] min-h-screen md:min-h-0 flex flex-col justify-center relative z-10"
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="w-full max-w-[480px] min-h-screen md:min-h-0 flex flex-col justify-center relative z-10 px-4 md:px-0"
             >
-                {/* Main Content Area - Full bleed on mobile, card on desktop */}
-                <div className="bg-white/40 md:bg-white md:rounded-[3rem] md:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] md:border md:border-white/50 overflow-hidden flex flex-col min-h-screen md:min-h-0">
+                {/* Main Content Area */}
+                <div className="bg-white/80 backdrop-blur-3xl md:rounded-[3.5rem] md:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.1)] border border-white/50 overflow-hidden flex flex-col min-h-[90vh] md:min-h-0 shadow-xl">
 
-                    {/* Hero Section */}
-                    <div className="pt-16 pb-8 px-8 text-center">
-                        <motion.div
-                            animate={{
-                                y: [0, -8, 0],
-                            }}
-                            transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                            }}
-                            className="flex justify-center mb-8"
-                        >
-                            <div className="w-40 h-40 md:w-44 md:h-44 relative">
-                                <div className="absolute inset-0 bg-gray-200/50 rounded-full blur-3xl scale-125"></div>
-                                <img
-                                    src="/zen-3d-logo.png"
-                                    alt="Zen Logo"
-                                    className="w-full h-full object-contain relative z-10 drop-shadow-[0_15px_25px_rgba(0,0,0,0.1)]"
-                                />
+                    {/* Logo Section */}
+                    <div className="pt-20 pb-10 px-8 text-center">
+                        <div className="flex justify-center mb-10">
+                            <div className="w-44 h-44 relative group">
+                                <div className="absolute inset-0 bg-gray-100/50 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-1000"></div>
+                                <div className="w-full h-full rounded-2xl bg-white border border-gray-100 shadow-lg relative z-10 flex items-center justify-center p-4 overflow-hidden">
+                                    <img
+                                        src="/dpm-logo.png"
+                                        alt="DPM Logo"
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
                             </div>
-                        </motion.div>
+                        </div>
 
-                        <h1 className="text-3xl md:text-4xl font-bold mb-8 tracking-tight text-gray-900">
-                            {activeTab === "register" ? "Create Your Account" : "Welcome Back"}
-                        </h1>
+                        <div className="space-y-1">
+                            <h1 className="text-3xl font-bold tracking-tight text-[#1A1A1A]">
+                                {activeTab === "register" ? "Create Account" : "Welcome Back"}
+                            </h1>
+                            <p className="text-xs text-gray-500 font-medium">
+                                {activeTab === "register" ? "Join DPM Fragrances" : "Sign in to your account"}
+                            </p>
+                        </div>
 
-                        {/* Minimalist Tab Switcher */}
-                        <div className="relative flex p-1 bg-gray-200/50 rounded-2xl mb-8">
+                        {/* Tab Switcher */}
+                        <div className="relative flex p-1 bg-gray-100/80 rounded-2xl mt-12 mb-4 mx-4">
                             <motion.div
-                                className="absolute top-1 bottom-1 rounded-xl bg-white shadow-sm"
+                                className="absolute top-1 bottom-1 rounded-xl bg-white shadow-sm border border-gray-200/50"
                                 animate={{
                                     left: activeTab === "register" ? "4px" : "50%",
-                                    width: "calc(50% - 6px)"
+                                    width: "calc(50% - 8px)"
                                 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 35 }}
                             />
                             <button
                                 onClick={() => setActiveTab("register")}
-                                className={`flex-1 py-3 text-xs font-black transition-all relative z-10 tracking-widest ${activeTab === "register" ? "text-gray-900" : "text-gray-500"}`}
+                                className={`flex-1 py-3 text-sm font-semibold transition-all relative z-10 ${activeTab === "register" ? "text-gray-900" : "text-gray-400"}`}
                             >
-                                REGISTER
+                                Register
                             </button>
                             <button
                                 onClick={() => setActiveTab("login")}
-                                className={`flex-1 py-3 text-xs font-black transition-all relative z-10 tracking-widest ${activeTab === "login" ? "text-gray-900" : "text-gray-500"}`}
+                                className={`flex-1 py-3 text-sm font-semibold transition-all relative z-10 ${activeTab === "login" ? "text-gray-900" : "text-gray-400"}`}
                             >
-                                LOG IN
+                                Log In
                             </button>
                         </div>
                     </div>
 
-                    {/* Form Body */}
-                    <div className="px-8 pb-16 flex-1">
+                    {/* Form Container */}
+                    <div className="px-8 pb-16">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
-                                initial={{ opacity: 0, x: 10 }}
+                                initial={{ opacity: 0, x: 15 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                transition={{ duration: 0.3 }}
+                                exit={{ opacity: 0, x: -15 }}
+                                transition={{ duration: 0.4 }}
                             >
                                 {error && (
-                                    <div className="mb-6 p-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3">
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="mb-8 p-4 text-xs text-red-600 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3"
+                                    >
                                         <AlertCircle size={18} className="flex-shrink-0" />
-                                        <span className="font-medium">{error}</span>
-                                    </div>
+                                        <span className="font-semibold">{error}</span>
+                                    </motion.div>
                                 )}
 
                                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -371,7 +375,7 @@ export default function AuthForm() {
                                         <button
                                             type="button"
                                             onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                                            className="w-full px-5 py-4.5 rounded-2xl bg-gray-50 border border-gray-200 text-left flex items-center justify-between hover:bg-white transition-all focus:ring-2 focus:ring-gray-200 outline-none"
+                                            className="w-full px-5 py-4.5 rounded-2xl bg-gray-50 border border-gray-200 text-left flex items-center justify-between hover:bg-white transition-all outline-none"
                                         >
                                             <div className="flex items-center gap-3">
                                                 {formData.country && (
@@ -390,39 +394,42 @@ export default function AuthForm() {
                                             <ChevronDown size={18} className={`text-gray-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
                                         </button>
 
-                                        {isCountryDropdownOpen && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 5 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] max-h-60 overflow-y-auto"
-                                            >
-                                                {countries.map((c) => (
-                                                    <button
-                                                        key={c.code}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setFormData(prev => ({ ...prev, country: c.name, phonePrefix: c.prefix, phoneNumber: "" }));
-                                                            setIsCountryDropdownOpen(false);
-                                                        }}
-                                                        className="w-full px-5 py-4 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
-                                                    >
-                                                        <div className="relative w-7 h-5 rounded-sm overflow-hidden border border-gray-100">
-                                                            <Image src={c.flag} alt={c.name} fill className="object-cover" unoptimized />
-                                                        </div>
-                                                        <span className="text-gray-700 font-medium">{c.name}</span>
-                                                        <span className="ml-auto text-xs text-gray-400">{c.prefix}</span>
-                                                    </button>
-                                                ))}
-                                            </motion.div>
-                                        )}
+                                        <AnimatePresence>
+                                            {isCountryDropdownOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 5 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 5 }}
+                                                    className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl max-h-64 overflow-y-auto no-scrollbar"
+                                                >
+                                                    {countries.map((c) => (
+                                                        <button
+                                                            key={c.code}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setFormData(prev => ({ ...prev, country: c.name, phonePrefix: c.prefix, phoneNumber: "" }));
+                                                                setIsCountryDropdownOpen(false);
+                                                            }}
+                                                            className="w-full px-5 py-4 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
+                                                        >
+                                                            <div className="relative w-7 h-5 rounded-sm overflow-hidden border border-gray-100">
+                                                                <Image src={c.flag} alt={c.name} fill className="object-cover" unoptimized />
+                                                            </div>
+                                                            <span className="text-gray-700 font-semibold">{c.name}</span>
+                                                            <span className="ml-auto text-xs text-gray-400">{c.prefix}</span>
+                                                        </button>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
 
-                                    {/* Inputs */}
+                                    {/* Input Fields */}
                                     <div className="space-y-4">
-                                        <div className="flex rounded-2xl bg-gray-50 border border-gray-200 focus-within:ring-2 focus-within:ring-gray-200 transition-all overflow-hidden focus-within:bg-white focus-within:border-gray-300">
-                                            <span className="px-5 flex items-center bg-gray-100/50 text-gray-600 font-bold border-r border-gray-200 min-w-[75px] justify-center text-sm">
+                                        <div className="flex bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-gray-200 focus-within:bg-white transition-all">
+                                            <div className="px-5 flex items-center bg-gray-100/50 text-gray-500 font-bold text-sm border-r border-gray-200 min-w-[80px] justify-center">
                                                 {formData.phonePrefix}
-                                            </span>
+                                            </div>
                                             <input
                                                 type="text"
                                                 name="phoneNumber"
@@ -430,18 +437,18 @@ export default function AuthForm() {
                                                 value={formData.phoneNumber}
                                                 onChange={handleInputChange}
                                                 className="w-full px-5 py-4.5 bg-transparent outline-none text-gray-900 font-semibold placeholder:text-gray-400"
-                                                placeholder={activeTab === "login" ? "Email or Phone" : "912345678"}
+                                                placeholder={activeTab === "login" ? "Email or Phone" : "Phone Number"}
                                             />
                                         </div>
 
-                                        <div className="relative group">
+                                        <div className="relative">
                                             <input
                                                 type={showPassword ? "text" : "password"}
                                                 name="password"
                                                 required
                                                 value={formData.password}
                                                 onChange={handleInputChange}
-                                                className="w-full px-5 py-4.5 rounded-2xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-gray-200 outline-none text-gray-900 font-semibold placeholder:text-gray-400 transition-all pr-14 focus:bg-white focus:border-gray-300"
+                                                className="w-full px-5 py-4.5 rounded-2xl bg-gray-50 border border-gray-200 outline-none text-gray-900 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 focus:bg-white transition-all pr-14"
                                                 placeholder="Password"
                                             />
                                             <button
@@ -454,25 +461,29 @@ export default function AuthForm() {
                                         </div>
 
                                         {activeTab === "register" && (
-                                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                className="overflow-hidden"
+                                            >
                                                 <input
                                                     type={showPassword ? "text" : "password"}
                                                     name="confirmPassword"
                                                     required={activeTab === "register"}
                                                     value={formData.confirmPassword}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-5 py-4.5 rounded-2xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-gray-200 outline-none text-gray-900 font-semibold placeholder:text-gray-400 transition-all focus:bg-white focus:border-gray-300"
+                                                    className="w-full px-5 py-4.5 rounded-2xl bg-gray-50 border border-gray-200 outline-none text-gray-900 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 focus:bg-white transition-all"
                                                     placeholder="Confirm Password"
                                                 />
                                             </motion.div>
                                         )}
                                     </div>
 
-                                    {/* Main Button */}
+                                    {/* Action Button */}
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full py-5 mt-6 bg-gray-900 hover:bg-black text-white rounded-2xl font-black text-sm tracking-widest shadow-xl shadow-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 uppercase"
+                                        className="w-full py-5 mt-8 bg-gray-900 hover:bg-black text-white rounded-2xl font-bold text-sm shadow-xl shadow-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                                     >
                                         {loading ? (
                                             <Loader2 className="animate-spin" size={20} />
@@ -485,28 +496,29 @@ export default function AuthForm() {
                         </AnimatePresence>
                     </div>
 
-                    {/* Simple Footer */}
-                    <div className="pb-12 px-8 text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                        Privacy Secured • Zen Inc.
-                    </div>
                 </div>
 
-                {/* Subdued Support/Blocked Info - Only shows when blocked */}
-                {isAccountBlocked && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 px-8 text-center">
-                        <p className="text-red-500 font-bold text-xs uppercase mb-4">Account Restricted</p>
-                        {supportLink && (
-                            <a
-                                href={supportLink.startsWith('http') ? supportLink : `https://t.me/${supportLink.replace('@', '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-gray-900 font-black text-xs underline underline-offset-4"
-                            >
-                                Contact Support
-                            </a>
-                        )}
-                    </motion.div>
-                )}
+                {/* Account Status Modal/Message */}
+                <AnimatePresence>
+                    {isAccountBlocked && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-10 px-8 text-center bg-white/40 backdrop-blur-xl py-8 rounded-[2.5rem] border border-white/50"
+                        >
+                            <ShieldAlert size={32} className="mx-auto text-red-500 mb-4" />
+                            <p className="text-[#1A1A1A] font-black text-[10px] uppercase tracking-widest mb-6">Security Restriction Enabled</p>
+                            {supportLink && (
+                                <button
+                                    onClick={() => window.open(supportLink.startsWith('http') ? supportLink : `https://t.me/${supportLink.replace('@', '')}`, '_blank')}
+                                    className="px-10 py-4 bg-[#1A1A1A] text-white rounded-full font-black text-[9px] tracking-widest uppercase hover:bg-black transition-all"
+                                >
+                                    Engage Support
+                                </button>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </div>
     );

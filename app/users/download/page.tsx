@@ -91,12 +91,12 @@ export default function DownloadAppPage() {
                 {/* Hero App Branding Section */}
                 <section className="px-6 py-8 flex gap-6">
                     <div className="w-24 h-24 shrink-0 rounded-[1.5rem] bg-white border border-gray-100 p-4 shadow-xl shadow-gray-200/50 overflow-hidden relative group">
-                        <img src="/zen-3d-logo-v2.png" alt="Zen App" className="w-full h-full object-contain relative z-10" />
+                        <img src="/dpm-logo.png" alt="DPM App" className="w-full h-full object-contain relative z-10" />
                         <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                     <div className="flex flex-col justify-end pb-1">
-                        <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-none mb-1.5">Zen App</h1>
-                        <p className="text-sm font-bold text-emerald-600 mb-2">Zen Official Digital</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-none mb-1.5">DPM App</h1>
+                        <p className="text-sm font-bold text-emerald-600 mb-2">DPM Official Digital</p>
                         <p className="text-[11px] font-medium text-gray-400 tracking-wide">Contains ads • In-app purchases</p>
                     </div>
                 </section>
@@ -182,7 +182,7 @@ export default function DownloadAppPage() {
                                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
                                         <Smartphone size={32} className="text-blue-600" />
                                     </div>
-                                    <h2 className="text-xl font-black text-gray-900 mb-2">Install Zen App</h2>
+                                    <h2 className="text-xl font-black text-gray-900 mb-2">Install DPM App</h2>
                                     <p className="text-sm text-gray-600">Follow these steps to install the app on your device:</p>
                                 </div>
 

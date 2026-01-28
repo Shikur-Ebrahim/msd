@@ -167,7 +167,7 @@ export default function UserVipRulesPage() {
                     <div className="absolute inset-0 bg-amber-500/5 blur-xl"></div>
                     <div className="relative z-10">
                         <p className="text-sm font-medium text-amber-100/90 leading-relaxed">
-                            After reaching <span className="text-amber-400 font-bold">V7</span>, you can also apply for the position of <span className="text-white font-bold">regional manager</span>, become the top management of <span className="text-white font-bold">ZEN</span>, and receive an annual dividend of no less than
+                            After reaching <span className="text-amber-400 font-bold">V7</span>, you can also apply for the position of <span className="text-white font-bold">regional manager</span>, become the top management of <span className="text-white font-bold">DPM Fragrances</span>, and receive an annual dividend of no less than
                         </p>
                         <p className="text-xl font-bold text-amber-400 mt-2 bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
                             9,000,000 ETB

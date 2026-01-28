@@ -45,9 +45,6 @@ export default function Home() {
 
       </main>
 
-      <footer className="w-full py-6 text-center text-sm text-zinc-400">
-        &copy; {new Date().getFullYear()} Zen Perfumes. All rights reserved.
-      </footer>
     </div>
   );
 }

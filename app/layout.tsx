@@ -15,18 +15,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zen Boss",
-  description: "Zen Boss Application",
+  title: "DPM Fragrances",
+  description: "DPM Fragrances Application",
   manifest: "/manifest.json",
   icons: {
-    icon: "/zen-3d-logo-v2.png",
-    apple: "/zen-3d-logo-v2.png",
+    icon: "/dpm-logo.png",
+    apple: "/dpm-logo.png",
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Zen Boss",
-    startupImage: "/zen-3d-logo-v2.png"
+    title: "DPM Fragrances",
+    startupImage: "/dpm-logo.png"
   },
   formatDetection: {
     telephone: false,

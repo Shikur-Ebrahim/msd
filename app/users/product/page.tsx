@@ -117,7 +117,7 @@ export default function UserProductsPage() {
                     </motion.button>
                     <div className="flex flex-col">
                         <h1 className="text-xl font-bold tracking-tight leading-tight text-[#1A1A1A]">Store</h1>
-                        <span className="text-[10px] font-medium text-[#C9A24D] tracking-wider uppercase font-black">Zen Catalog</span>
+                        <span className="text-[10px] font-medium text-[#C9A24D] tracking-wider uppercase font-black">DPM Catalog</span>
                     </div>
                 </div>
                 <motion.div
@@ -125,7 +125,7 @@ export default function UserProductsPage() {
                     animate={{ rotate: 0 }}
                     className="w-12 h-12 relative p-1 bg-[#F9F9F9] rounded-2xl border border-[#EDEDED]"
                 >
-                    <img src="/zen-3d-logo.png" alt="Zen Logo" className="w-full h-full object-contain" />
+                    <img src="/dpm-logo.png" alt="DPM Logo" className="w-full h-full object-contain" />
                 </motion.div>
             </header>
 

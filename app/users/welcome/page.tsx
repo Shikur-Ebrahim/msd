@@ -300,7 +300,7 @@ function WelcomeContent() {
                         animate={{ scale: 1 }}
                         className="w-10 h-10 relative rounded-full overflow-hidden border border-[#F5E6D3]/20"
                     >
-                        <img src="/zen-3d-logo.png" alt="Zen Logo" className="w-full h-full object-cover" />
+                        <img src="/dpm-logo.png" alt="DPM Logo" className="w-full h-full object-cover" />
                     </motion.div>
                     <div className="flex flex-col">
                         <span className="text-[10px] font-medium text-[#F5E6D3]/40 uppercase tracking-wider">Account</span>
@@ -358,7 +358,7 @@ function WelcomeContent() {
                                                 >
                                                     <div className="w-10 h-10 rounded-lg bg-black shrink-0 flex items-center justify-center overflow-hidden">
                                                         <img
-                                                            src={notif.type === 'registration' ? encodeURI(`/level ${LEVEL_MAP[notif.level as string] || "1"}.jpg`) : "/zen-3d-logo.png"}
+                                                            src={notif.type === 'registration' ? encodeURI(`/level ${LEVEL_MAP[notif.level as string] || "1"}.jpg`) : "/dpm-logo.png"}
                                                             className="w-full h-full object-cover"
                                                             alt="Notif"
                                                         />

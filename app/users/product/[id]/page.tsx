@@ -210,10 +210,10 @@ export default function UserProductDetailPage() {
                 </button>
                 <div className="flex flex-col items-center">
                     <h1 className="text-lg font-bold text-slate-900">Details</h1>
-                    <span className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Zen Store</span>
+                    <span className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">DPM Store</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm">
-                    <img src="/zen-3d-logo.png" alt="Zen" className="w-6 h-6 object-contain" />
+                    <img src="/dpm-logo.png" alt="DPM" className="w-6 h-6 object-contain" />
                 </div>
             </header>
 
