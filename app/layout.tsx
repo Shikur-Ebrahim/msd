@@ -15,18 +15,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DPM Fragrances",
-  description: "DPM Fragrances Application",
+  title: "MSD Medicine",
+  description: "MSD Medicine Seller Application",
   manifest: "/manifest.json",
   icons: {
-    icon: "/dpm-logo.png",
-    apple: "/dpm-logo.png",
+    icon: "/msd-logo.png",
+    apple: "/msd-logo.png",
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "DPM Fragrances",
-    startupImage: "/dpm-logo.png"
+    title: "MSD Medicine",
+    startupImage: "/msd-logo.png"
   },
   formatDetection: {
     telephone: false,

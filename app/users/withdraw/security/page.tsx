@@ -15,9 +15,14 @@ import {
     Clock,
     Rocket,
     ChevronLeft,
-    Check
+    Check,
+    Fingerprint,
+    ShieldAlert,
+    Shield,
+    Activity
 } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 function SecurityContent() {
     const router = useRouter();
@@ -30,13 +35,12 @@ function SecurityContent() {
     const [verifying, setVerifying] = useState(false);
     const [hasPassword, setHasPassword] = useState(false);
     const [input, setInput] = useState("");
-    const [confirmInput, setConfirmInput] = useState(""); // For setting password logic
+    const [confirmInput, setConfirmInput] = useState("");
     const [step, setStep] = useState<"check" | "set" | "confirm" | "enter">("check");
     const [shake, setShake] = useState(false);
 
-    // Restriction States
-    const [isRestricted, setIsRestricted] = useState(false); // 24h Cap
-    const [isPartnerRestricted, setIsPartnerRestricted] = useState(false); // Verified Recharge
+    const [isRestricted, setIsRestricted] = useState(false);
+    const [isPartnerRestricted, setIsPartnerRestricted] = useState(false);
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [minRecharge, setMinRecharge] = useState<number>(4500);
     const [withdrawalSettings, setWithdrawalSettings] = useState<any>({
@@ -51,7 +55,6 @@ function SecurityContent() {
             }
             setUser(currentUser);
 
-            // Fetch User Data for Password Check
             const userRef = doc(db, "users", currentUser.uid);
             const docSnap = await getDoc(userRef);
             if (docSnap.exists()) {
@@ -75,7 +78,6 @@ function SecurityContent() {
                     }
                 }
 
-                // Fetch Withdrawal Settings
                 const withdrawRef = doc(db, "GlobalSettings", "withdrawal");
                 const withdrawSnap = await getDoc(withdrawRef);
                 if (withdrawSnap.exists()) {
@@ -90,7 +92,6 @@ function SecurityContent() {
         return () => unsubscribeAuth();
     }, [router]);
 
-    // Handle Numpad Input
     const handleNumClick = (num: string) => {
         if (input.length < 4) {
             setInput(prev => prev + num);
@@ -119,21 +120,18 @@ function SecurityContent() {
 
         try {
             if (step === "set") {
-                // Determine next step
                 setConfirmInput(input);
                 setInput("");
                 setStep("confirm");
                 setVerifying(false);
             } else if (step === "confirm") {
                 if (input === confirmInput) {
-                    // Save Password
                     await updateDoc(doc(db, "users", user.uid), {
                         withdrawalPassword: input
                     });
-                    toast.success("Security PIN Set Successfully");
+                    toast.success("Clinical PIN Set Successfully");
                     setUserData({ ...userData, withdrawalPassword: input });
 
-                    // AUTO EXECUTE WITHDRAWAL after setting password
                     const isRecruited = await checkPartnerStatus();
                     if (!isRecruited) {
                         setIsPartnerRestricted(true);
@@ -151,16 +149,14 @@ function SecurityContent() {
                     }
                     await executeWithdrawal();
                 } else {
-                    toast.error("PINs do not match. Try again.");
+                    toast.error("PINs do not match. Clinical reset triggered.");
                     setInput("");
                     setConfirmInput("");
                     setStep("set");
                     setVerifying(false);
                 }
             } else if (step === "enter") {
-                // Check Password
                 if (input === userData.withdrawalPassword) {
-                    // 1. CHECK PARTNER STATUS FIRST
                     const isRecruited = await checkPartnerStatus();
                     if (!isRecruited) {
                         setIsPartnerRestricted(true);
@@ -168,7 +164,6 @@ function SecurityContent() {
                         return;
                     }
 
-                    // 2. CHECK 24H RESTRICTION 
                     const dailyRestricted = await checkRestriction();
                     if (dailyRestricted) {
                         setIsRestricted(true);
@@ -177,44 +172,35 @@ function SecurityContent() {
                     }
                     await executeWithdrawal();
                 } else {
-                    // Wrong Password
                     setShake(true);
                     setTimeout(() => setShake(false), 500);
-                    setCustomError("Incorrect PIN. Please re-enter.");
+                    setCustomError("Invalid Clinical Key. Access Denied.");
                     setInput("");
                     setVerifying(false);
                 }
             }
         } catch (error) {
             console.error(error);
-            toast.error("An error occurred");
+            toast.error("Protocol error. Please retry.");
             setVerifying(false);
         }
     };
 
     const checkRestriction = async () => {
         if (!user) return false;
-
         const now = new Date();
         const f = withdrawalSettings.frequency || 1;
-        // Start date for checking previous withdrawals: today - (f-1) days at 0:00
         const checkStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (f - 1));
-
-        // Fetch all withdrawals for this user (avoids composite index requirement)
         const q = query(
             collection(db, "Withdrawals"),
             where("userId", "==", user.uid)
         );
-
         const snapshot = await getDocs(q);
-
-        // Filter by date on the client side to avoid index issues
         const hasRestrictedWithdrawal = snapshot.docs.some(doc => {
             const data = doc.data();
             const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
             return createdAt >= checkStartDate;
         });
-
         return hasRestrictedWithdrawal;
     };
 
@@ -240,18 +226,13 @@ function SecurityContent() {
         if (isRestricted) {
             timer = setInterval(() => {
                 const now = new Date();
-
-                // Reset always happens at midnight 0:00
                 const targetReset = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
                 targetReset.setHours(0, 0, 0, 0);
-
                 const diff = targetReset.getTime() - now.getTime();
-
                 if (diff <= 0) {
                     setIsRestricted(false);
                     return;
                 }
-
                 setTimeLeft({
                     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
                     hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -268,19 +249,14 @@ function SecurityContent() {
             const amount = Number(amountParam);
             const fee = amount * 0.05;
             const actualReceipt = amount - fee;
-
-            // Fetch Linked Bank Snapshot
             const bankSnap = await getDoc(doc(db, "Bank", user.uid));
             const rawBankData = bankSnap.data() as any;
-
-            // Filter Bank Details (Remove status, uid, createdAt etc)
             const bankDetails = {
                 accountNumber: rawBankData?.accountNumber,
                 bankLogoUrl: rawBankData?.bankLogoUrl,
                 bankName: rawBankData?.bankName,
                 holderName: rawBankData?.holderName,
             };
-
             await addDoc(collection(db, "Withdrawals"), {
                 userId: user.uid,
                 amount: amount,
@@ -292,8 +268,6 @@ function SecurityContent() {
                 userEmail: user.email,
                 userPhone: userData.phoneNumber || ""
             });
-
-            // ADD NOTIFICATION
             await addDoc(collection(db, "UserNotifications"), {
                 userId: user.uid,
                 type: "withdrawal",
@@ -302,241 +276,271 @@ function SecurityContent() {
                 read: false,
                 createdAt: serverTimestamp()
             });
-
             await updateDoc(doc(db, "users", user.uid), {
                 balance: increment(-amount)
             });
-
-            // SHOW SUCCESS MODAL INSTEAD OF REDIRECT
             setShowSuccessModal(true);
             setVerifying(false);
         } catch (error) {
             console.error(error);
-            toast.error("Withdrawal Failed");
+            toast.error("Refund Protocol Failed");
             setVerifying(false);
         }
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-                <Loader2 className="w-10 h-10 text-[#D4AF37] animate-spin" />
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-green-600 animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center p-6 text-center relative overflow-hidden selection:bg-[#D4AF37]/30">
-            {/* Background Decorative Elements */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#D4AF37]/5 blur-[120px] rounded-full" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#9A7B4F]/5 blur-[100px] rounded-full" />
+        <div className="min-h-screen bg-white text-blue-900 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden selection:bg-blue-100 font-sans">
+            {/* Ambient Background Glow */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-50/50 blur-[120px] rounded-full"></div>
+                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-green-50/30 blur-[100px] rounded-full"></div>
             </div>
 
-            {/* 🚀 Partner Recruitment Modal */}
-            {isPartnerRestricted && (
-                <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-2xl flex items-center justify-center p-6 animate-in fade-in duration-700">
-                    <div className="bg-[#111111] w-full max-w-sm rounded-[3.5rem] p-10 border border-[#D4AF37]/20 shadow-[0_0_80px_rgba(212,175,55,0.1)] relative overflow-hidden animate-in zoom-in-90 duration-500">
-                        <div className="absolute -top-32 -right-32 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none"></div>
+            {/* Partner Recruitment Modal */}
+            <AnimatePresence>
+                {isPartnerRestricted && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="fixed inset-0 z-[120] bg-white/95 backdrop-blur-2xl flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="bg-white w-full max-w-sm rounded-[3.5rem] p-12 border border-blue-50 shadow-3xl relative overflow-hidden text-center"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-orange-500"></div>
 
-                        <div className="relative z-10 flex flex-col items-center text-center gap-10">
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-[2.5rem] blur-2xl animate-pulse"></div>
-                                <div className="w-28 h-28 rounded-[2.5rem] bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] p-[1px] shadow-2xl relative">
-                                    <div className="w-full h-full rounded-[2.45rem] bg-[#0a0a0a] flex items-center justify-center text-[#D4AF37]">
-                                        <Rocket size={54} strokeWidth={1.2} className="relative z-10 animate-bounce" />
-                                    </div>
-                                </div>
+                            <div className="w-28 h-28 rounded-[2.5rem] bg-blue-50 flex items-center justify-center mx-auto mb-10 border border-blue-100 shadow-inner">
+                                <Rocket size={56} className="text-blue-600 animate-bounce" strokeWidth={1.5} />
                             </div>
 
-                            <div className="space-y-4">
-                                <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-[#FCF6BA] via-[#D4AF37] to-[#B38728] uppercase tracking-tighter leading-none italic">
-                                    Unlock<br />Withdrawals
+                            <div className="space-y-4 mb-10">
+                                <h3 className="text-3xl font-black text-blue-900 uppercase tracking-tighter leading-none italic">
+                                    Activate<br />Disbursement
                                 </h3>
-                                <p className="text-white/40 text-xs font-bold leading-relaxed px-2 uppercase tracking-wider">
-                                    Withdrawals are available only for <span className="text-[#D4AF37] font-black">Turner Partners</span>.
-                                    Recharge your wallet and join to start withdrawing.
+                                <p className="text-blue-900/40 text-[11px] font-black leading-relaxed px-4 uppercase tracking-widest">
+                                    Refund protocols are available only for <span className="text-blue-900">Verified Personnel</span>.
+                                    Complete your first clinical order to start withdrawals.
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => router.push(`/users/recharge?amount=${minRecharge}`)}
-                                className="w-full py-6 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-black rounded-[2.2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all"
+                                className="w-full py-6 bg-orange-500 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-orange-500/20 active:scale-95 transition-all"
                             >
-                                Recharge & Join Now
+                                Secure Verification
                             </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* 24-Hour Restriction Overlay */}
-            {isRestricted && (
-                <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-2xl flex items-center justify-center p-6 animate-in fade-in duration-500">
-                    <div className="bg-[#1A1A1A] rounded-[3.5rem] p-10 w-full max-w-sm border border-amber-500/20 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-500">
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl opacity-50"></div>
+            <AnimatePresence>
+                {isRestricted && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="fixed inset-0 z-[70] bg-white/95 backdrop-blur-2xl flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="bg-white rounded-[3.5rem] p-12 w-full max-w-sm border border-orange-100 shadow-3xl text-center relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-orange-500"></div>
 
-                        <div className="relative z-10 flex flex-col items-center text-center gap-8">
-                            <div className="w-24 h-24 rounded-[2rem] bg-amber-500/10 flex items-center justify-center relative shadow-inner">
-                                <Clock size={48} className="text-amber-500" />
+                            <div className="w-24 h-24 rounded-[2rem] bg-orange-50 flex items-center justify-center mx-auto mb-8 border border-orange-100">
+                                <Clock size={48} className="text-orange-500" />
                             </div>
 
-                            <div className="space-y-3">
-                                <h3 className="text-2xl font-black text-white tracking-tighter uppercase">Limit Reached</h3>
-                                <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em]">Next window starts in:</p>
+                            <div className="space-y-4 mb-8">
+                                <h3 className="text-2xl font-black text-blue-900 uppercase tracking-tighter">Usage Cap</h3>
+                                <p className="text-[10px] font-black text-orange-600 uppercase tracking-[0.3em]">Protocol refresh in:</p>
                             </div>
 
-                            <div className="flex gap-4 justify-center w-full bg-[#0A0A0A] py-8 rounded-[2.5rem] border border-white/5">
+                            <div className="flex gap-6 justify-center w-full bg-blue-50/50 py-8 rounded-[2.5rem] border border-blue-50 mb-10">
                                 {[
                                     { val: timeLeft.hours, label: 'Hrs' },
                                     { val: timeLeft.minutes, label: 'Min' },
-                                    { val: timeLeft.seconds, label: 'Sec', color: 'text-amber-500' }
+                                    { val: timeLeft.seconds, label: 'Sec', color: 'text-orange-600' }
                                 ].map((t, i) => (
                                     <div key={i} className="flex flex-col items-center min-w-[60px]">
-                                        <span className={`text-3xl font-black ${t.color || 'text-white'} tabular-nums`}>{t.val.toString().padStart(2, '0')}</span>
-                                        <span className="text-[8px] font-black text-white/30 uppercase tracking-widest mt-1">{t.label}</span>
+                                        <span className={`text-3xl font-black ${t.color || 'text-blue-900'} tabular-nums`}>{t.val.toString().padStart(2, '0')}</span>
+                                        <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-widest mt-1">{t.label}</span>
                                     </div>
                                 ))}
                             </div>
 
                             <button
                                 onClick={() => router.push('/users/welcome')}
-                                className="w-full py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[2rem] text-[10px] font-black uppercase tracking-[0.3em] transition-all"
+                                className="w-full py-6 bg-blue-900 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all shadow-xl shadow-blue-900/20"
                             >
                                 Acknowleged
                             </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Success Modal Overlay */}
-            {showSuccessModal && (
-                <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-2xl flex items-center justify-center p-6 animate-in fade-in duration-700">
-                    <div className="bg-[#1a1a1a] w-full max-w-sm rounded-[3.5rem] p-10 border border-[#D4AF37]/30 shadow-[0_0_80px_rgba(212,175,55,0.1)] relative overflow-hidden animate-in zoom-in-95 duration-500">
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-[100px] pointer-events-none"></div>
+            {/* Success Modal */}
+            <AnimatePresence>
+                {showSuccessModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-2xl flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="bg-white w-full max-w-sm rounded-[3.5rem] p-12 border border-blue-50 shadow-3xl text-center relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-green-500"></div>
 
-                        <div className="relative z-10 flex flex-col items-center text-center gap-8">
-                            <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] p-[1px] shadow-2xl">
-                                <div className="w-full h-full rounded-[1.95rem] bg-[#1a1a1a] flex items-center justify-center text-[#D4AF37]">
-                                    <CheckCircle2 size={48} strokeWidth={1.5} className="animate-in zoom-in duration-500" />
-                                </div>
+                            <div className="w-24 h-24 rounded-[2rem] bg-green-50 flex items-center justify-center mx-auto mb-10 border border-green-100 shadow-inner">
+                                <CheckCircle2 size={56} className="text-green-600 animate-in zoom-in duration-500" />
                             </div>
 
-                            <div className="space-y-4">
-                                <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-[#FCF6BA] via-[#D4AF37] to-[#B38728] uppercase tracking-tight">Withdrawal Placed</h3>
-                                <p className="text-white/40 text-[11px] font-bold leading-relaxed px-4 uppercase tracking-tighter">
-                                    Your request is being processed. Expected arrival:<br />
-                                    <span className="text-[#D4AF37] font-black">2 - 72 Business Hours</span>
+                            <div className="space-y-4 mb-10">
+                                <h3 className="text-3xl font-black text-blue-900 uppercase tracking-tight leading-none italic">Refund Placed</h3>
+                                <p className="text-blue-900/40 text-[11px] font-black leading-relaxed px-4 uppercase tracking-widest">
+                                    Settlement request initialized. Verification window:<br />
+                                    <span className="text-blue-900 font-black">2 - 72 Clinical Hours</span>
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => router.push('/users/welcome')}
-                                className="w-full py-6 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-black rounded-[2.2rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
+                                className="w-full py-6 bg-blue-900 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
                             >
-                                Return to Home
+                                Process Complete
                             </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Header/Icon */}
-            <div className="mb-10 relative">
-                <div className="w-24 h-24 bg-[#1A1A1A] border border-[#D4AF37]/20 rounded-[2.5rem] shadow-2xl flex items-center justify-center relative z-10 text-[#D4AF37]">
-                    {step === "enter" ? <Lock size={36} strokeWidth={1.5} /> : <ShieldCheck size={36} strokeWidth={1.5} />}
+            {/* Header Icon */}
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="mb-10 relative"
+            >
+                <div className="w-24 h-24 bg-white border border-blue-100 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 flex items-center justify-center relative z-10 text-blue-600">
+                    {step === "enter" ? <Lock size={42} strokeWidth={1.5} /> : <Fingerprint size={42} strokeWidth={1.5} />}
                 </div>
-                <div className="absolute inset-0 bg-[#D4AF37]/10 rounded-[2.5rem] blur-2xl animate-pulse"></div>
-            </div>
+                <div className="absolute inset-0 bg-blue-500/5 rounded-[2.5rem] blur-2xl animate-pulse"></div>
+            </motion.div>
 
             {/* Title & Instructions */}
             <div className="space-y-4 mb-14 max-w-xs mx-auto relative z-10">
-                <h2 className="text-3xl font-black uppercase text-white tracking-tighter leading-none italic">
-                    {step === "set" ? "Create Security PIN" : step === "confirm" ? "Confirm PIN" : "Security Check"}
+                <h2 className="text-4xl font-black uppercase text-blue-900 tracking-tighter leading-none italic">
+                    {step === "set" ? "Node Access" : step === "confirm" ? "Verify Key" : "Security Gateway"}
                 </h2>
-                <div className="h-1 w-10 bg-[#D4AF37]/30 mx-auto rounded-full"></div>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] leading-relaxed">
+                <div className="h-1.5 w-12 bg-blue-600/10 mx-auto rounded-full"></div>
+                <p className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.3em] leading-relaxed">
                     {step === "set"
-                        ? "Secure your funds with a 4-digit code."
+                        ? "Encrypt your clinical node with a 4-digit key."
                         : step === "confirm"
-                            ? "Verify your new security code."
-                            : "Unlock authorization to proceed."}
+                            ? "Verify your new clinical security key."
+                            : "Authorize protocol execution via PIN."}
                 </p>
             </div>
 
             {/* PIN Display */}
-            <div className={`flex gap-8 mb-16 relative z-10 ${shake ? "animate-shake" : ""}`}>
+            <div className={`flex gap-6 mb-16 relative z-10 ${shake ? "animate-shake bg-red-50 p-6 rounded-[2rem]" : ""}`}>
                 {[...Array(4)].map((_, i) => (
                     <div
                         key={i}
-                        className={`w-4 h-4 rounded-full transition-all duration-500 border-2 ${i < input.length
-                            ? "bg-[#D4AF37] border-[#FCF6BA] scale-125 shadow-[0_0_15px_rgba(212,175,55,0.5)]"
-                            : "bg-transparent border-white/10"
+                        className={`w-5 h-5 rounded-full transition-all duration-500 border-2 ${i < input.length
+                            ? "bg-orange-500 border-orange-600 scale-125 shadow-lg shadow-orange-500/20"
+                            : "bg-blue-50 border-blue-100 scale-100"
                             }`}
                     ></div>
                 ))}
             </div>
 
             {/* Inline Error Message */}
-            <div className="h-12 mb-6 w-full flex items-center justify-center relative z-10">
-                {customError && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-5 py-2.5 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <AlertCircle size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">{customError}</span>
-                    </div>
-                )}
+            <div className="h-14 mb-8 w-full flex items-center justify-center relative z-10">
+                <AnimatePresence>
+                    {customError && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="bg-red-50 border border-red-100 text-red-600 px-6 py-3 rounded-2xl flex items-center gap-3"
+                        >
+                            <ShieldAlert size={18} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">{customError}</span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Numpad */}
-            <div className="grid grid-cols-3 gap-x-12 gap-y-8 mb-12 w-full max-w-[320px] relative z-10">
+            <div className="grid grid-cols-3 gap-x-14 gap-y-10 mb-14 w-full max-w-[340px] relative z-10">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                     <button
                         key={num}
                         onClick={() => handleNumClick(num.toString())}
-                        className="w-16 h-16 rounded-full text-2xl font-black text-white hover:bg-white/5 active:bg-white/10 transition-all flex items-center justify-center"
+                        className="w-18 h-18 rounded-full text-3xl font-black text-blue-900 hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
                     >
                         {num}
                     </button>
                 ))}
-                <div className="w-16 h-16"></div>
+                <div className="w-18 h-18"></div>
                 <button
                     onClick={() => handleNumClick("0")}
-                    className="w-16 h-16 rounded-full text-2xl font-black text-white hover:bg-white/5 active:bg-white/10 transition-all flex items-center justify-center"
+                    className="w-18 h-18 rounded-full text-3xl font-black text-blue-900 hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
                 >
                     0
                 </button>
                 <button
                     onClick={handleDelete}
-                    className="w-16 h-16 rounded-full flex items-center justify-center text-white/20 hover:text-white/40 transition-all"
+                    className="w-18 h-18 rounded-full flex items-center justify-center text-blue-900/20 hover:text-blue-900/40 transition-all active:scale-90"
                 >
-                    <Delete size={28} />
+                    <Delete size={32} />
                 </button>
             </div>
 
             {/* Action Button */}
-            <div className="w-full max-w-[320px] relative z-10">
+            <div className="w-full max-w-[340px] relative z-10">
                 <button
                     onClick={handleAction}
                     disabled={input.length !== 4 || verifying}
-                    className="w-full py-6 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] disabled:opacity-30 disabled:grayscale text-black rounded-[2.2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                    className="w-full h-20 bg-blue-900 disabled:opacity-30 disabled:grayscale text-white rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-4"
                 >
                     {verifying ? (
-                        <Loader2 className="animate-spin" size={20} />
+                        <Loader2 className="animate-spin" size={24} />
                     ) : (
                         <>
-                            {step === "enter" && <Check size={18} />}
-                            <span>{step === "enter" ? "Authorize Payout" : "Continue"}</span>
+                            {step === "enter" && <Shield size={18} strokeWidth={2.5} />}
+                            <span>{step === "enter" ? "Authorize Disbursement" : "Process Step"}</span>
                         </>
                     )}
                 </button>
 
                 <button
                     onClick={() => router.back()}
-                    className="mt-8 text-[9px] font-black text-white/20 uppercase tracking-[0.4em] hover:text-white transition-all"
+                    className="mt-10 text-[9px] font-black text-blue-900/20 uppercase tracking-[0.5em] hover:text-blue-900 transition-all"
                 >
-                    Cancel transaction
+                    Abort Protocol
                 </button>
+            </div>
+
+            {/* Stealth Logistics */}
+            <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none opacity-20 z-0 select-none">
+                <span className="text-[10px] font-black uppercase tracking-[0.8em] text-blue-900">N-256 SECURED GATEWAY</span>
             </div>
         </div>
     );
@@ -545,8 +549,8 @@ function SecurityContent() {
 export default function SecurityPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A]">
-                <Loader2 className="w-10 h-10 animate-spin text-[#D4AF37]" />
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
             </div>
         }>
             <SecurityContent />
