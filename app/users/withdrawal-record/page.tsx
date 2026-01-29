@@ -97,7 +97,6 @@ export default function WithdrawalRecordPage() {
     }
 
     return (
-    return (
         <div className="min-h-screen bg-white text-blue-900 font-sans selection:bg-blue-500/30 pb-32 overflow-hidden">
             {/* Medical Background Glow */}
             <div className="fixed inset-0 pointer-events-none z-0">
