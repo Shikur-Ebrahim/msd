@@ -110,10 +110,12 @@ export default function WithdrawalRecordPage() {
     }, [records]);
 
     if (loading) {
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-            <Loader2 className="w-12 h-12 animate-spin text-orange-600" />
-            <p className="mt-8 text-xs font-bold text-slate-400">Loading your records...</p>
-        </div>
+        return (
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+                <Loader2 className="w-12 h-12 animate-spin text-orange-600" />
+                <p className="mt-8 text-xs font-bold text-slate-400">Loading your records...</p>
+            </div>
+        );
     }
 
     return (
@@ -133,7 +135,7 @@ export default function WithdrawalRecordPage() {
                     <ChevronLeft size={24} strokeWidth={2.5} />
                 </button>
                 <div className="flex-1 text-center">
-                    <h1 className="text-[22px] font-black text-[#0f172a] tracking-tight">Withdrawal History</h1>
+                    <h1 className="text-[22px] font-bold text-[#0f172a] tracking-tight">Withdrawal History</h1>
                 </div>
                 <div className="w-14 h-14 flex items-center justify-center rounded-[1.5rem] bg-orange-50 text-orange-600 active:scale-95 transition-all shadow-xl shadow-orange-100/30 border border-orange-100/50">
                     <History size={24} strokeWidth={2.5} />
@@ -147,8 +149,8 @@ export default function WithdrawalRecordPage() {
                         <div className="relative z-10">
                             <p className="text-[10px] font-bold text-slate-400 mb-2">Total Paid</p>
                             <div className="flex items-baseline gap-1.5">
-                                <span className="text-2xl font-black text-slate-900 tracking-tighter tabular-nums">{stats.totalSettled.toLocaleString()}</span>
-                                <span className="text-[9px] font-black text-slate-400">ETB</span>
+                                <span className="text-2xl font-bold text-slate-900 tracking-tighter tabular-nums">{stats.totalSettled.toLocaleString()}</span>
+                                <span className="text-[9px] font-bold text-slate-400">ETB</span>
                             </div>
                         </div>
                     </div>
@@ -156,10 +158,10 @@ export default function WithdrawalRecordPage() {
                     <div className="bg-white p-7 rounded-[2rem] shadow-xl shadow-orange-900/5 border border-orange-50 flex flex-col justify-center h-32 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-full blur-2xl -mr-10 -mt-10 opacity-60"></div>
                         <div className="relative z-10">
-                            <p className="text-[10px] font-bold text-orange-400 mb-2">Under Review</p>
+                            <p className="text-[10px] font-bold text-orange-400 mb-2">Pending</p>
                             <div className="flex items-baseline gap-1.5">
-                                <span className="text-2xl font-black text-slate-900 tracking-tighter tabular-nums">{stats.inPipeline.toLocaleString()}</span>
-                                <span className="text-[9px] font-black text-slate-400">ETB</span>
+                                <span className="text-2xl font-bold text-slate-900 tracking-tighter tabular-nums">{stats.inPipeline.toLocaleString()}</span>
+                                <span className="text-[9px] font-bold text-slate-400">ETB</span>
                             </div>
                         </div>
                     </div>
@@ -171,7 +173,7 @@ export default function WithdrawalRecordPage() {
                         <div className="space-y-8">
                             <div className="flex items-center gap-5 px-3">
                                 <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                                <h3 className="text-[10px] font-black text-orange-600 uppercase tracking-widest leading-none">Reviewing ({pending.length})</h3>
+                                <h3 className="text-[10px] font-bold text-orange-600 leading-none">Pending ({pending.length})</h3>
                                 <div className="flex-1 h-[1px] bg-orange-100"></div>
                             </div>
                             <div className="space-y-10">
@@ -186,7 +188,7 @@ export default function WithdrawalRecordPage() {
                     <div className="space-y-8">
                         <div className="flex items-center gap-5 px-3">
                             <div className="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Recent History</h3>
+                            <h3 className="text-[10px] font-bold text-slate-400 leading-none">History</h3>
                             <div className="flex-1 h-[1px] bg-slate-100"></div>
                         </div>
                         {history.length > 0 ? (
@@ -201,8 +203,8 @@ export default function WithdrawalRecordPage() {
                                     <Banknote size={40} className="text-slate-200" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-sm font-black text-slate-400">No records found</p>
-                                    <p className="text-[10px] text-slate-300 font-bold">You haven't made any withdrawals yet.</p>
+                                    <p className="text-sm font-bold text-slate-400">No records found</p>
+                                    <p className="text-[10px] text-slate-300 font-medium">You haven't made any withdrawals yet.</p>
                                 </div>
                             </div>
                         ) : null}
@@ -239,16 +241,16 @@ function WithdrawalCard({ item, status }: any) {
                                 isSuccess ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                                     'bg-rose-50 text-rose-600 border-rose-100'}`}>
                             {isPending ? <Clock size={12} className="animate-pulse" /> : isSuccess ? <CheckCircle2 size={12} /> : <ShieldAlert size={12} />}
-                            <span>{status === 'pending' ? 'Reviewing' : isSuccess ? 'Success' : 'Rejected'}</span>
+                            <span>{status === 'pending' ? 'Pending' : isSuccess ? 'Success' : 'Rejected'}</span>
                             {item.type === 'weekend' && (
-                                <span className="ml-1 px-1.5 py-0.5 bg-orange-500 text-white rounded text-[7px] font-black uppercase">Weekend</span>
+                                <span className="ml-1 px-1.5 py-0.5 bg-orange-500 text-white rounded text-[9px] font-bold">Weekend</span>
                             )}
                         </div>
                         <div className="flex items-baseline gap-2 mt-4">
-                            <span className={`text-4xl font-black tracking-tighter tabular-nums ${isPending ? 'text-slate-900' : isSuccess ? 'text-emerald-600' : 'text-rose-500'}`}>
+                            <span className={`text-4xl font-bold tracking-tighter tabular-nums ${isPending ? 'text-slate-900' : isSuccess ? 'text-emerald-600' : 'text-rose-500'}`}>
                                 {Number(item.actualReceipt).toLocaleString()}
                             </span>
-                            <span className="text-[10px] font-bold text-slate-300">Net Amount</span>
+                            <span className="text-[10px] font-bold text-slate-300">Amount</span>
                         </div>
                     </div>
 
@@ -263,8 +265,8 @@ function WithdrawalCard({ item, status }: any) {
 
                 {/* Processing Fee Section */}
                 <div className="bg-slate-50/40 rounded-[2rem] p-7 flex justify-between items-center border border-slate-50">
-                    <span className="text-[11px] font-bold text-slate-400">Processing Fee</span>
-                    <span className="text-sm font-black text-rose-500">-{Number(item.fee).toLocaleString()} ETB</span>
+                    <span className="text-[11px] font-bold text-slate-400">Withdrawal Fee</span>
+                    <span className="text-sm font-bold text-rose-500">-{Number(item.fee).toLocaleString()} ETB</span>
                 </div>
 
                 {/* Destination Section */}
@@ -272,22 +274,22 @@ function WithdrawalCard({ item, status }: any) {
                     <div className="flex justify-between items-center px-1">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
-                            <span className="text-[10px] font-bold text-slate-400">Received Account</span>
+                            <span className="text-[10px] font-bold text-slate-400">Bank Account</span>
                         </div>
-                        <span className="text-[9px] font-black text-orange-600 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100">{item.bankDetails?.bankName}</span>
+                        <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100">{item.bankDetails?.bankName}</span>
                     </div>
 
                     <div className="bg-slate-50/40 rounded-[2.5rem] p-9 space-y-5 border border-slate-50">
                         <div className="flex justify-between items-center gap-4">
                             <span className="text-[10px] font-bold text-slate-400">Account Number</span>
-                            <span className="text-sm font-black text-slate-900 tracking-widest font-mono">
+                            <span className="text-sm font-bold text-slate-900 tracking-widest font-mono">
                                 {item.bankDetails?.accountNumber}
                             </span>
                         </div>
 
                         <div className="flex justify-between items-center gap-4 border-t border-slate-100 pt-4">
-                            <span className="text-[10px] font-bold text-slate-400">Account Holder Name</span>
-                            <p className="text-xs font-black text-slate-800 truncate text-right">
+                            <span className="text-[10px] font-bold text-slate-400">Account Name</span>
+                            <p className="text-xs font-bold text-slate-800 truncate text-right">
                                 {item.bankDetails?.holderName}
                             </p>
                         </div>
@@ -301,16 +303,16 @@ function WithdrawalCard({ item, status }: any) {
                         {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) : new Date(item.createdAt).toLocaleDateString()}
                     </div>
 
-                    <div className="flex items-center gap-2 text-orange-600 font-black text-[10px] tracking-tight">
+                    <div className="flex items-center gap-2 text-orange-600 font-bold text-[10px] tracking-tight">
                         {isSuccess ? (
                             <div className="flex items-center gap-1.5 text-emerald-600">
                                 <CheckCircle2 size={14} strokeWidth={3} />
-                                <span>Paid Successfully</span>
+                                <span>Paid</span>
                             </div>
                         ) : isPending ? (
                             <div className="flex items-center gap-1.5 text-orange-500">
                                 <Clock size={14} strokeWidth={3} className="animate-pulse" />
-                                <span>Under Review</span>
+                                <span>Pending</span>
                             </div>
                         ) : (
                             <div className="flex items-center gap-1.5 text-rose-500">

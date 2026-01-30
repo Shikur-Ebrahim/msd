@@ -200,17 +200,17 @@ export default function WithdrawalPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <h3 className="text-2xl font-black text-blue-900 tracking-tight uppercase">Protocol Alert</h3>
-                                <p className="text-sm font-black text-blue-900/40 leading-relaxed px-2">
+                                <h3 className="text-2xl font-bold text-blue-900 tracking-tight">Alert</h3>
+                                <p className="text-sm font-medium text-slate-400 leading-relaxed px-2">
                                     {errorModal.message}
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => setErrorModal(null)}
-                                className="w-full py-6 bg-red-500 text-white rounded-[1.8rem] text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                                className="w-full py-6 bg-red-500 text-white rounded-[1.8rem] text-sm font-bold shadow-xl shadow-red-500/20 active:scale-95 transition-all"
                             >
-                                Acknowledge
+                                Ok
                             </button>
                         </div>
                     </div>
@@ -225,8 +225,8 @@ export default function WithdrawalPage() {
                 >
                     <ChevronLeft size={24} />
                 </button>
-                <h1 className="text-xl font-black uppercase tracking-widest text-blue-900 leading-none text-center flex-1">
-                    Health refund
+                <h1 className="text-xl font-bold text-blue-900 text-center flex-1">
+                    Withdraw
                 </h1>
                 <div className="w-12" /> {/* Spacer */}
             </header>
@@ -253,8 +253,8 @@ export default function WithdrawalPage() {
                                         <Clock size={32} />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-[10px] font-black text-red-500 tracking-[0.2em] uppercase mb-1">Clinic Closed</p>
-                                        <p className="text-base font-black text-blue-900">
+                                        <p className="text-sm font-bold text-red-500 mb-1">Closed</p>
+                                        <p className="text-base font-bold text-blue-900">
                                             Opens at {withdrawalSettings.startTime} tomorrow
                                         </p>
                                     </div>
@@ -267,8 +267,8 @@ export default function WithdrawalPage() {
                                     <CheckCircle2 size={32} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-black text-green-600 tracking-[0.2em] uppercase mb-1">Clinic Active</p>
-                                    <p className="text-base font-black text-blue-900">
+                                    <p className="text-sm font-bold text-green-600 mb-1">Active</p>
+                                    <p className="text-base font-bold text-blue-900">
                                         Available until {withdrawalSettings.endTime}
                                     </p>
                                 </div>
@@ -283,7 +283,7 @@ export default function WithdrawalPage() {
                     <div className="bg-white rounded-[3rem] p-12 border border-blue-50 shadow-xl shadow-blue-900/5 relative overflow-hidden h-64 flex flex-col justify-center">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-blue-50 rounded-full blur-3xl -mr-20 -mt-20"></div>
 
-                        <p className="text-blue-900/40 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Refund Amount</p>
+                        <p className="text-slate-400 text-sm font-medium mb-4">Withdraw Amount</p>
                         <div className="flex items-baseline gap-4 relative z-10">
                             <input
                                 type="number"
@@ -312,28 +312,28 @@ export default function WithdrawalPage() {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                     <div className="flex justify-between items-center p-6 rounded-[2rem] bg-blue-50/50 border border-blue-100">
-                        <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Health Balance</span>
-                        <span className="text-xl font-black text-blue-900 tabular-nums">
-                            {Number(userData?.balance || 0).toLocaleString()} <span className="text-[10px] text-blue-900/40">ETB</span>
+                        <span className="text-sm font-bold text-slate-800">Balance</span>
+                        <span className="text-xl font-bold text-blue-900 tabular-nums">
+                            {Number(userData?.balance || 0).toLocaleString()} <span className="text-xs text-slate-400">ETB</span>
                         </span>
                     </div>
 
                     <div className="space-y-4 px-2">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                                <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Clinical Fee</span>
-                                <div className="px-3 py-1 rounded-lg bg-green-500 text-white text-[9px] font-black uppercase tracking-widest leading-none">5%</div>
+                                <span className="text-sm font-bold text-slate-800">Fee</span>
+                                <div className="px-3 py-1 rounded-lg bg-green-500 text-white text-[10px] font-bold leading-none">5%</div>
                             </div>
-                            <span className="text-sm font-black text-red-500 tabular-nums">-{fee.toLocaleString()} ETB</span>
+                            <span className="text-sm font-bold text-red-500 tabular-nums">-{fee.toLocaleString()} ETB</span>
                         </div>
                         <div className="h-[1px] bg-blue-50"></div>
                         <div className="flex justify-between items-end pt-2">
-                            <span className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-1">Actual yield</span>
+                            <span className="text-sm font-bold text-slate-400 mb-1">You will receive</span>
                             <div className="flex items-baseline gap-2">
                                 <span className="text-4xl font-black text-green-600 tabular-nums tracking-tighter">
                                     {actualReceipt.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </span>
-                                <span className="text-green-600/40 font-black text-sm uppercase tracking-widest">ETB</span>
+                                <span className="text-green-600/40 font-bold text-sm uppercase tracking-widest">ETB</span>
                             </div>
                         </div>
                     </div>
@@ -341,44 +341,49 @@ export default function WithdrawalPage() {
 
                 {/* Bank Selection */}
                 <section className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-                    <div className="flex items-center gap-3 px-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-900"></div>
-                        <h2 className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Receiving Medical account</h2>
+                    <div className="flex items-center justify-between px-1">
+                        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Select Withdrawal Account</h2>
                     </div>
 
                     {linkedBank ? (
-                        <div className="bg-white rounded-[3rem] p-2 border border-blue-50 hover:border-blue-200 transition-all group/bank shadow-xl shadow-blue-900/5">
-                            <div className="p-10 relative overflow-hidden flex flex-col gap-10">
-                                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-50 rounded-full blur-3xl -mr-20 -mt-20"></div>
-
-                                <div className="flex items-center gap-6 relative z-10">
-                                    <div className="w-20 h-20 rounded-[1.8rem] bg-blue-50 border border-blue-100 flex items-center justify-center p-3 shadow-inner group-hover/bank:scale-105 transition-all">
+                        <div className="bg-white rounded-[2.5rem] border-2 border-indigo-50 shadow-xl shadow-indigo-100/20 overflow-hidden group/bank hover:border-indigo-200 transition-all cursor-pointer">
+                            <div className="p-8 space-y-8">
+                                {/* Top Section */}
+                                <div className="flex items-center gap-6">
+                                    <div className="w-20 h-20 rounded-[1.5rem] bg-white border border-slate-100 flex items-center justify-center p-3 shadow-sm group-hover/bank:scale-105 transition-transform duration-500">
                                         {linkedBank.bankLogoUrl ? (
-                                            <img src={linkedBank.bankLogoUrl} alt={linkedBank.bankName} className="w-full h-full object-contain filter drop-shadow-[0_2px_5px_rgba(30,58,138,0.1)]" />
+                                            <img src={linkedBank.bankLogoUrl} alt={linkedBank.bankName} className="w-full h-full object-contain" />
                                         ) : (
-                                            <Wallet className="text-blue-900/40" size={36} />
+                                            <Wallet className="text-slate-300" size={32} />
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-2xl font-black text-blue-900 truncate tracking-tight leading-none">{linkedBank.bankName}</h4>
-                                        <p className="text-[10px] font-black text-blue-900/40 tracking-[0.2em] uppercase mt-2">{linkedBank.holderName}</p>
+                                        <h4 className="text-2xl font-black text-slate-800 truncate tracking-tight uppercase leading-none">
+                                            {linkedBank.accountNumber.slice(0, 10)}... <span className="text-slate-200">Account</span>
+                                        </h4>
+                                        <p className="text-sm font-bold text-slate-400 mt-2 tracking-wide uppercase">{linkedBank.holderName}</p>
                                     </div>
-                                    <div className="text-blue-900/10 group-hover/bank:text-blue-900 transition-all">
-                                        <ChevronRight size={28} />
+                                    <div className="text-indigo-100 group-hover/bank:text-indigo-400 transition-colors">
+                                        <ChevronRight size={24} />
                                     </div>
                                 </div>
 
-                                <div className="pt-10 border-t border-blue-50 grid grid-cols-2 gap-8 relative z-10">
-                                    <div className="space-y-2">
-                                        <p className="text-[10px] font-black text-blue-900/20 uppercase tracking-[0.15em]">Health ID No.</p>
-                                        <p className="text-base font-black text-blue-900 tracking-widest font-mono truncate">{linkedBank.accountNumber}</p>
+                                {/* Divider */}
+                                <div className="border-t-2 border-dashed border-slate-50"></div>
+
+                                {/* Details Section */}
+                                <div className="space-y-4 px-1">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Bank</span>
+                                        <span className="text-sm font-bold text-slate-600">{linkedBank.bankName}</span>
                                     </div>
-                                    <div className="space-y-2 text-right">
-                                        <p className="text-[10px] font-black text-blue-900/20 uppercase tracking-[0.15em]">Account Status</p>
-                                        <div className="flex items-center justify-end gap-2">
-                                            <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                                            <p className="text-xs font-black text-green-600 uppercase tracking-widest">Medical Verified</p>
-                                        </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Holder</span>
+                                        <span className="text-sm font-bold text-slate-600">{linkedBank.holderName}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Number</span>
+                                        <span className="text-sm font-bold text-slate-800 font-mono tracking-tighter">{linkedBank.accountNumber}</span>
                                     </div>
                                 </div>
                             </div>
@@ -391,8 +396,8 @@ export default function WithdrawalPage() {
                             <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-6 group-hover/add:scale-110 transition-all text-blue-600 border border-blue-100">
                                 <CreditCard size={36} />
                             </div>
-                            <p className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-2">No Clinical account</p>
-                            <p className="text-sm text-blue-900/40 font-black tracking-tight">Tap to register receiving bank details</p>
+                            <p className="text-sm font-bold text-slate-800 mb-2">No Bank Account</p>
+                            <p className="text-sm text-slate-400">Tap to connect your bank account</p>
                         </div>
                     )}
                 </section>
@@ -403,9 +408,9 @@ export default function WithdrawalPage() {
 
                     <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-900 border border-blue-100">
-                            <AlertCircle size={22} />
+                            <Info size={22} />
                         </div>
-                        <h3 className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em]">Clinical Rules</h3>
+                        <h3 className="text-sm font-bold text-slate-800">Rules</h3>
                     </div>
 
                     <ul className="space-y-8">
@@ -420,11 +425,11 @@ export default function WithdrawalPage() {
                             return (
                                 <li key={i} className="flex gap-4 items-start group/tip">
                                     <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5 group-hover/tip:bg-blue-900 group-hover/tip:text-white transition-all">
-                                        <span className="text-[11px] font-black transition-colors">{i + 1}</span>
+                                        <span className="text-xs font-bold transition-colors">{i + 1}</span>
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-black text-blue-900/40 leading-relaxed group-hover/tip:text-blue-900 transition-all tracking-tight">
-                                            <span className="text-blue-900/20 mr-1 uppercase tracking-widest">{label}:</span> {val.join(": ")}
+                                        <p className="text-sm text-slate-400 leading-relaxed group-hover/tip:text-blue-900 transition-all tracking-tight">
+                                            <span className="text-slate-200 mr-1">{label}:</span> {val.join(": ")}
                                         </p>
                                     </div>
                                 </li>
@@ -438,10 +443,10 @@ export default function WithdrawalPage() {
             <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl p-8 pb-12 border-t border-blue-50 shadow-[0_-20px_50px_rgba(0,0,0,0.05)] relative z-[60]">
                 <button
                     onClick={handleWithdrawClick}
-                    className="w-full bg-orange-500 text-white py-7 rounded-[2.5rem] font-black uppercase tracking-[0.25em] text-xs shadow-xl shadow-orange-500/20 hover:shadow-2xl hover:bg-orange-600 transition-all duration-500 flex items-center justify-center gap-4 group"
+                    className="w-full bg-orange-500 text-white py-7 rounded-[2.5rem] font-bold text-lg shadow-xl shadow-orange-500/20 hover:shadow-2xl hover:bg-orange-600 transition-all duration-500 flex items-center justify-center gap-4 group"
                 >
-                    <Lock size={20} className="group-hover:scale-110 transition-transform" />
-                    <span>Initiate refund</span>
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                    <span>Withdraw</span>
                 </button>
             </div>
         </div>

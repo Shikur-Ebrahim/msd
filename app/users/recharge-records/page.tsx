@@ -128,7 +128,7 @@ export default function RechargeRecordsPage() {
             case "verified":
                 return {
                     icon: CheckCircle2,
-                    label: "Clinically Verified",
+                    label: "Verified",
                     bgColor: "bg-green-500",
                     textColor: "text-green-600",
                     borderColor: "border-green-100",
@@ -137,7 +137,7 @@ export default function RechargeRecordsPage() {
             default:
                 return {
                     icon: Clock,
-                    label: "Under Clinical Review",
+                    label: "Under Review",
                     bgColor: "bg-orange-500",
                     textColor: "text-orange-600",
                     borderColor: "border-orange-100",
@@ -190,8 +190,8 @@ export default function RechargeRecordsPage() {
                 >
                     <ChevronLeft size={24} />
                 </button>
-                <h1 className="text-xl font-black uppercase tracking-widest text-blue-900 leading-none">
-                    Funding Claims
+                <h1 className="text-xl font-bold text-blue-900 leading-none">
+                    Recharge History
                 </h1>
                 <div className="w-12" />
             </header>
@@ -201,18 +201,18 @@ export default function RechargeRecordsPage() {
                 <div className="grid grid-cols-2 gap-5">
                     <div className="bg-white rounded-[3rem] p-8 border border-blue-50 shadow-xl shadow-blue-900/5 relative overflow-hidden flex flex-col justify-center h-40">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-full blur-2xl -mr-12 -mt-12"></div>
-                        <p className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em] mb-4">Total Funding</p>
+                        <p className="text-xs font-bold text-blue-900/40 mb-4">Total Recharge</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-black text-blue-900 tracking-tighter tabular-nums">{stats.totalAmount.toLocaleString()}</span>
-                            <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-widest">ETB</span>
+                            <span className="text-2xl font-bold text-blue-900 tracking-tight tabular-nums">{stats.totalAmount.toLocaleString()}</span>
+                            <span className="text-[10px] font-bold text-blue-900/40">ETB</span>
                         </div>
                     </div>
 
                     <div className="space-y-4">
                         <div className="bg-white rounded-[2rem] p-6 border border-green-100 shadow-xl shadow-green-900/5 flex items-center justify-between h-[calc(50%-8px)]">
                             <div>
-                                <p className="text-[9px] font-black text-green-600/40 uppercase tracking-widest">Success</p>
-                                <p className="text-xl font-black text-blue-900">{stats.verified}</p>
+                                <p className="text-[10px] font-bold text-green-600/40">Success</p>
+                                <p className="text-lg font-bold text-blue-900">{stats.verified}</p>
                             </div>
                             <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 border border-green-100">
                                 <CheckCircle2 size={20} />
@@ -220,8 +220,8 @@ export default function RechargeRecordsPage() {
                         </div>
                         <div className="bg-white rounded-[2rem] p-6 border border-orange-100 shadow-xl shadow-orange-900/5 flex items-center justify-between h-[calc(50%-8px)]">
                             <div>
-                                <p className="text-[9px] font-black text-orange-600/40 uppercase tracking-widest">Pending</p>
-                                <p className="text-xl font-black text-blue-900">{stats.underReview}</p>
+                                <p className="text-[10px] font-bold text-orange-600/40">Pending</p>
+                                <p className="text-lg font-bold text-blue-900">{stats.underReview}</p>
                             </div>
                             <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 border border-orange-100">
                                 <Clock size={20} />
@@ -233,14 +233,14 @@ export default function RechargeRecordsPage() {
                 {/* Filter Tabs */}
                 <div className="flex p-2 bg-white rounded-[2rem] shadow-xl shadow-blue-900/5 border border-blue-50">
                     {[
-                        { key: "all", label: "All Claims" },
+                        { key: "all", label: "All" },
                         { key: "verified", label: "Verified" },
-                        { key: "under review", label: "In Review" }
+                        { key: "under review", label: "Pending" }
                     ].map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setFilter(tab.key as any)}
-                            className={`flex-1 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${filter === tab.key
+                            className={`flex-1 py-4 rounded-[1.5rem] text-xs font-bold transition-all duration-500 ${filter === tab.key
                                 ? "bg-blue-900 text-white shadow-xl shadow-blue-900/20"
                                 : "text-blue-900/40 hover:text-blue-900"
                                 }`}
@@ -257,7 +257,7 @@ export default function RechargeRecordsPage() {
                             <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto border border-blue-100">
                                 <FileText className="w-10 h-10 text-blue-900/20" />
                             </div>
-                            <p className="text-blue-900/20 font-black tracking-[0.2em] uppercase text-[10px]">No archives found</p>
+                            <p className="text-blue-900/40 font-bold text-sm">No records found</p>
                         </div>
                     ) : (
                         filteredRecords.map((record) => {
@@ -283,17 +283,17 @@ export default function RechargeRecordsPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-black text-blue-900 tracking-tight leading-none mb-2">{record.paymentMethod}</h3>
-                                                <p className="text-[10px] font-black text-blue-900/40 uppercase tracking-widest">{formatDate(record.timestamp)}</p>
+                                                <h3 className="text-xl font-bold text-blue-900 tracking-tight leading-none mb-2">{record.paymentMethod}</h3>
+                                                <p className="text-[11px] font-medium text-blue-900/40">{formatDate(record.timestamp)}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-3xl font-black text-blue-900 tracking-tighter tabular-nums leading-none mb-2">{record.amount.toLocaleString()}</p>
-                                            <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg ${record.status.toLowerCase() === 'verified'
+                                            <p className="text-2xl font-bold text-blue-900 tracking-tight tabular-nums leading-none mb-2">{record.amount.toLocaleString()}</p>
+                                            <span className={`text-[10px] font-bold px-3 py-1 rounded-lg ${record.status.toLowerCase() === 'verified'
                                                 ? 'bg-green-500 text-white'
                                                 : 'bg-orange-500 text-white'
                                                 }`}>
-                                                ETB CLAIM
+                                                Recharge
                                             </span>
                                         </div>
                                     </div>
@@ -303,12 +303,12 @@ export default function RechargeRecordsPage() {
                                     <div className="grid grid-cols-2 gap-6 items-end">
                                         <div className="space-y-5">
                                             <div className="flex flex-col">
-                                                <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-widest mb-1">Medical Provider</span>
-                                                <span className="text-sm font-black text-blue-900 truncate">{record.bankName}</span>
+                                                <span className="text-[11px] font-bold text-blue-900/20 mb-1">Bank Name</span>
+                                                <span className="text-sm font-bold text-blue-900 truncate">{record.bankName}</span>
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-widest mb-1">Patient Name</span>
-                                                <span className="text-sm font-black text-blue-900 truncate">{record.accountHolderName}</span>
+                                                <span className="text-[11px] font-bold text-blue-900/20 mb-1">Account Name</span>
+                                                <span className="text-sm font-bold text-blue-900 truncate">{record.accountHolderName}</span>
                                             </div>
                                         </div>
 
@@ -317,8 +317,8 @@ export default function RechargeRecordsPage() {
                                                 ? 'bg-green-50 border-green-100 text-green-600 shadow-lg shadow-green-500/5'
                                                 : 'bg-orange-50 border-orange-100 text-orange-600 shadow-lg shadow-orange-500/5'
                                                 }`}>
-                                                <StatusIcon size={16} strokeWidth={2.5} />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.15em] leading-none">{statusConfig.label}</span>
+                                                <StatusIcon size={16} strokeWidth={2} />
+                                                <span className="text-[10px] font-bold leading-none">{statusConfig.label}</span>
                                             </div>
                                         </div>
                                     </div>

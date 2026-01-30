@@ -137,7 +137,7 @@ function SecurityContent() {
                     await updateDoc(doc(db, "users", user.uid), {
                         withdrawalPassword: input
                     });
-                    toast.success("Clinical PIN Set Successfully");
+                    toast.success("Withdrawal PIN Set Successfully");
                     setUserData({ ...userData, withdrawalPassword: input });
 
                     const isRecruited = await checkPartnerStatus();
@@ -157,7 +157,7 @@ function SecurityContent() {
                     }
                     await executeWithdrawal();
                 } else {
-                    toast.error("PINs do not match. Clinical reset triggered.");
+                    toast.error("PINs do not match. Please try again.");
                     setInput("");
                     setConfirmInput("");
                     setStep("set");
@@ -182,7 +182,7 @@ function SecurityContent() {
                 } else {
                     setShake(true);
                     setTimeout(() => setShake(false), 500);
-                    setCustomError("Invalid Clinical Key. Access Denied.");
+                    setCustomError("Invalid PIN. Access Denied.");
                     setInput("");
                     setVerifying(false);
                 }
@@ -348,7 +348,7 @@ function SecurityContent() {
             setVerifying(false);
         } catch (error) {
             console.error(error);
-            toast.error("Refund Protocol Failed");
+            toast.error("Withdrawal Failed");
             setVerifying(false);
         }
     };
@@ -389,20 +389,20 @@ function SecurityContent() {
                             </div>
 
                             <div className="space-y-4 mb-10">
-                                <h3 className="text-3xl font-black text-blue-900 uppercase tracking-tighter leading-none italic">
-                                    Activate<br />Disbursement
+                                <h3 className="text-3xl font-bold text-blue-900 leading-none italic">
+                                    Activation<br />Required
                                 </h3>
-                                <p className="text-blue-900/40 text-[11px] font-black leading-relaxed px-4 uppercase tracking-widest">
-                                    Refund protocols are available only for <span className="text-blue-900">Verified Personnel</span>.
-                                    Complete your first clinical order to start withdrawals.
+                                <p className="text-blue-900/40 text-[11px] font-bold leading-relaxed px-4 text-center">
+                                    Withdrawals are available only for verified customers.
+                                    Complete your first order to start withdrawals.
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => router.push(`/users/recharge?amount=${minRecharge}`)}
-                                className="w-full py-6 bg-orange-500 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-orange-500/20 active:scale-95 transition-all"
+                                className="w-full py-6 bg-orange-500 text-white rounded-[2rem] text-[11px] font-bold shadow-xl shadow-orange-500/20 active:scale-95 transition-all"
                             >
-                                Secure Verification
+                                Get Verified
                             </button>
                         </motion.div>
                     </motion.div>
@@ -429,8 +429,8 @@ function SecurityContent() {
                             </div>
 
                             <div className="space-y-4 mb-8">
-                                <h3 className="text-2xl font-black text-blue-900 uppercase tracking-tighter">Usage Cap</h3>
-                                <p className="text-[10px] font-black text-orange-600 uppercase tracking-[0.3em]">Protocol refresh in:</p>
+                                <h3 className="text-2xl font-bold text-blue-900">Withdrawal Limit</h3>
+                                <p className="text-[10px] font-bold text-orange-600">Available again in:</p>
                             </div>
 
                             <div className="flex gap-6 justify-center w-full bg-orange-50/50 py-8 rounded-[2.5rem] border border-orange-50 mb-10">
@@ -440,17 +440,17 @@ function SecurityContent() {
                                     { val: timeLeft.seconds, label: 'Sec', color: 'text-orange-600' }
                                 ].map((t, i) => (
                                     <div key={i} className="flex flex-col items-center min-w-[60px]">
-                                        <span className={`text-3xl font-black ${t.color || 'text-blue-900'} tabular-nums`}>{t.val.toString().padStart(2, '0')}</span>
-                                        <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-widest mt-1">{t.label}</span>
+                                        <span className={`text-3xl font-bold ${t.color || 'text-blue-900'} tabular-nums`}>{t.val.toString().padStart(2, '0')}</span>
+                                        <span className="text-[9px] font-bold text-blue-900/20 mt-1">{t.label}</span>
                                     </div>
                                 ))}
                             </div>
 
                             <button
                                 onClick={() => router.push('/users/welcome')}
-                                className="w-full py-6 bg-blue-900 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all shadow-xl shadow-blue-900/20"
+                                className="w-full py-6 bg-blue-900 text-white rounded-[2rem] text-[11px] font-bold transition-all shadow-xl shadow-blue-900/20"
                             >
-                                Acknowleged
+                                OK
                             </button>
                         </motion.div>
                     </motion.div>
@@ -477,18 +477,18 @@ function SecurityContent() {
                             </div>
 
                             <div className="space-y-4 mb-10">
-                                <h3 className="text-3xl font-black text-blue-900 uppercase tracking-tight leading-none italic">Weekend Refund Placed</h3>
-                                <p className="text-blue-900/40 text-[11px] font-black leading-relaxed px-4 uppercase tracking-widest">
-                                    Settlement request initialized. Verification window:<br />
-                                    <span className="text-blue-900 font-black">2 - 72 Clinical Hours</span>
+                                <h3 className="text-3xl font-bold text-blue-900 tracking-tight leading-none italic">Withdrawal Successful</h3>
+                                <p className="text-blue-900/40 text-[11px] font-bold leading-relaxed px-4">
+                                    Withdrawal request received. Processing time:<br />
+                                    <span className="text-blue-900 font-bold">2 - 72 hours</span>
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => router.push('/users/welcome')}
-                                className="w-full py-6 bg-blue-900 text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
+                                className="w-full py-6 bg-blue-900 text-white rounded-[2rem] text-[11px] font-bold shadow-xl shadow-blue-900/20 active:scale-95 transition-all"
                             >
-                                Process Complete
+                                Done
                             </button>
                         </motion.div>
                     </motion.div>
@@ -509,16 +509,16 @@ function SecurityContent() {
 
             {/* Title & Instructions */}
             <div className="space-y-4 mb-14 max-w-xs mx-auto relative z-10">
-                <h2 className="text-4xl font-black uppercase text-blue-900 tracking-tighter leading-none italic">
-                    {step === "set" ? "Node Access" : step === "confirm" ? "Verify Key" : "Security Gateway"}
+                <h2 className="text-4xl font-bold text-blue-900 tracking-tighter leading-none italic">
+                    {step === "set" ? "Set PIN" : step === "confirm" ? "Confirm PIN" : "Security Check"}
                 </h2>
                 <div className="h-1.5 w-12 bg-orange-600/10 mx-auto rounded-full"></div>
-                <p className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.3em] leading-relaxed">
+                <p className="text-[11px] font-bold text-blue-900/40 leading-relaxed">
                     {step === "set"
-                        ? "Encrypt your clinical node with a 4-digit key."
+                        ? "Set a 4-digit PIN for withdrawals."
                         : step === "confirm"
-                            ? "Verify your new clinical security key."
-                            : "Authorize protocol execution via PIN."}
+                            ? "Confirm your new withdrawal PIN."
+                            : "Enter your PIN to withdraw."}
                 </p>
             </div>
 
@@ -546,7 +546,7 @@ function SecurityContent() {
                             className="bg-red-50 border border-red-100 text-red-600 px-6 py-3 rounded-2xl flex items-center gap-3"
                         >
                             <ShieldAlert size={18} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">{customError}</span>
+                            <span className="text-[11px] font-bold">{customError}</span>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -558,7 +558,7 @@ function SecurityContent() {
                     <button
                         key={num}
                         onClick={() => handleNumClick(num.toString())}
-                        className="w-18 h-18 rounded-full text-3xl font-black text-blue-900 hover:bg-orange-50 active:scale-90 transition-all flex items-center justify-center"
+                        className="w-18 h-18 rounded-full text-3xl font-bold text-blue-900 hover:bg-orange-50 active:scale-90 transition-all flex items-center justify-center"
                     >
                         {num}
                     </button>
@@ -566,7 +566,7 @@ function SecurityContent() {
                 <div className="w-18 h-18"></div>
                 <button
                     onClick={() => handleNumClick("0")}
-                    className="w-18 h-18 rounded-full text-3xl font-black text-blue-900 hover:bg-orange-50 active:scale-90 transition-all flex items-center justify-center"
+                    className="w-18 h-18 rounded-full text-3xl font-bold text-blue-900 hover:bg-orange-50 active:scale-90 transition-all flex items-center justify-center"
                 >
                     0
                 </button>
@@ -583,29 +583,29 @@ function SecurityContent() {
                 <button
                     onClick={handleAction}
                     disabled={input.length !== 4 || verifying}
-                    className="w-full h-20 bg-blue-900 disabled:opacity-30 disabled:grayscale text-white rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-4"
+                    className="w-full h-20 bg-blue-900 disabled:opacity-30 disabled:grayscale text-white rounded-[2.5rem] text-sm font-bold shadow-2xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-4"
                 >
                     {verifying ? (
                         <Loader2 className="animate-spin" size={24} />
                     ) : (
                         <>
                             {step === "enter" && <Shield size={18} strokeWidth={2.5} />}
-                            <span>{step === "enter" ? "Authorize Disbursement" : "Process Step"}</span>
+                            <span>{step === "enter" ? "Withdraw" : "Next"}</span>
                         </>
                     )}
                 </button>
 
                 <button
                     onClick={() => router.back()}
-                    className="mt-10 text-[9px] font-black text-blue-900/20 uppercase tracking-[0.5em] hover:text-blue-900 transition-all"
+                    className="mt-10 text-[10px] font-bold text-blue-900/20 hover:text-blue-900 transition-all"
                 >
-                    Abort Protocol
+                    Cancel
                 </button>
             </div>
 
             {/* Stealth Logistics */}
             <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none opacity-20 z-0 select-none">
-                <span className="text-[10px] font-black uppercase tracking-[0.8em] text-blue-900">N-256 SECURED GATEWAY</span>
+                <span className="text-[10px] font-bold text-blue-900">SECURE GATEWAY</span>
             </div>
         </div>
     );

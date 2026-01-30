@@ -48,7 +48,7 @@ export default function InvitePage() {
     const handleCopy = () => {
         navigator.clipboard.writeText(referralLink);
         setCopied(true);
-        toast.success("Referral protocol copied to clipboard!");
+        toast.success("Link copied to clipboard!");
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -56,8 +56,8 @@ export default function InvitePage() {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Join MSD Medicine Protocol',
-                    text: 'Join me on MSD Medicine and get verified clinical rewards!',
+                    title: 'Join MSD',
+                    text: 'Join me on MSD and earn rewards!',
                     url: referralLink,
                 });
             } catch (error) {
@@ -95,7 +95,7 @@ export default function InvitePage() {
                     </button>
                     <div className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full">
                         <Sparkles size={14} className="text-blue-600" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-900/60">Referral Protocol</span>
+                        <span className="text-xs font-bold text-blue-900/60">Invite</span>
                     </div>
                     <div className="w-10"></div>
                 </div>
@@ -109,13 +109,13 @@ export default function InvitePage() {
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-3xl font-black text-blue-900 tracking-tight leading-tight"
+                        className="text-3xl font-bold text-blue-900 tracking-tight leading-tight"
                     >
-                        Expand Network<br />
-                        <span className="text-green-600">Clinical Growth</span>
+                        Invite Friends<br />
+                        <span className="text-green-600">Earn Rewards</span>
                     </motion.h1>
-                    <p className="text-[10px] font-black text-blue-900/40 max-w-[280px] uppercase tracking-widest leading-relaxed">
-                        Secure clinical rewards for every verified medical referral in your network.
+                    <p className="text-sm font-medium text-slate-400 max-w-[280px] leading-relaxed">
+                        Earn rewards for every friend who joins your network.
                     </p>
                 </div>
 
@@ -133,7 +133,7 @@ export default function InvitePage() {
                         {/* Floating elements mock style */}
                         <div className="absolute top-6 right-6 px-4 py-2 bg-white/95 backdrop-blur-xl rounded-2xl border border-blue-100 flex items-center gap-2 shadow-lg animate-bounce-slow">
                             <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                            <span className="text-[10px] font-black text-blue-900 tracking-widest uppercase">Verified +20%</span>
+                            <span className="text-xs font-bold text-blue-900">Bonus +20%</span>
                         </div>
                     </div>
                 </div>
@@ -144,16 +144,16 @@ export default function InvitePage() {
                         <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 text-blue-600 group-hover:scale-110 transition-transform border border-blue-100">
                             <Users size={24} />
                         </div>
-                        <span className="text-[10px] font-black text-blue-900/30 uppercase tracking-widest mb-1.5">Network Size</span>
-                        <span className="text-2xl font-black text-blue-900">{stats.invited}</span>
+                        <span className="text-xs font-bold text-slate-300 mb-1.5">Team Size</span>
+                        <span className="text-2xl font-bold text-blue-900">{stats.invited}</span>
                     </div>
 
                     <div className="bg-white rounded-[2rem] p-6 border border-blue-50 shadow-xl shadow-blue-900/5 flex flex-col items-center text-center group hover:bg-blue-50/30 transition-all duration-300">
                         <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-4 text-green-600 group-hover:scale-110 transition-transform border border-green-100">
                             <Coins size={24} />
                         </div>
-                        <span className="text-[10px] font-black text-blue-900/30 uppercase tracking-widest mb-1.5">Total Revenue</span>
-                        <span className="text-2xl font-black text-green-600">{stats.earned.toLocaleString()}</span>
+                        <span className="text-xs font-bold text-slate-300 mb-1.5">Total Earned</span>
+                        <span className="text-2xl font-bold text-green-600">{stats.earned.toLocaleString()}</span>
                     </div>
                 </div>
 
@@ -161,9 +161,9 @@ export default function InvitePage() {
                 <div className="w-full bg-white rounded-[2.5rem] p-8 border border-blue-50 relative shadow-2xl shadow-blue-900/5 mb-10">
                     <div className="flex flex-col space-y-6">
                         <div className="space-y-3 px-1">
-                            <label className="text-[10px] font-black text-blue-900/30 uppercase tracking-[0.2em] ml-1">Personal Invitation Portal</label>
+                            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">Your Invite Link</label>
                             <div className="relative group/link" onClick={handleCopy}>
-                                <div className="w-full bg-blue-50 border border-blue-100 rounded-[1.5rem] px-6 py-5 text-[11px] font-black text-blue-900 truncate focus:outline-none transition-all group-hover/link:bg-blue-100 cursor-pointer">
+                                <div className="w-full bg-blue-50 border border-blue-100 rounded-[1.5rem] px-6 py-5 text-sm font-bold text-blue-900 truncate focus:outline-none transition-all group-hover/link:bg-blue-100 cursor-pointer">
                                     {referralLink}
                                 </div>
                                 <div className="absolute right-6 top-1/2 -translate-y-1/2 text-blue-900/20 group-hover/link:text-blue-600 transition-colors">
@@ -175,13 +175,13 @@ export default function InvitePage() {
                         <div className="flex gap-4">
                             <button
                                 onClick={handleCopy}
-                                className={`flex-[2] h-16 rounded-[1.5rem] font-black text-[11px] tracking-[0.2em] transition-all duration-500 flex items-center justify-center gap-3 active:scale-95 uppercase ${copied
+                                className={`flex-[2] h-16 rounded-[1.5rem] font-bold text-sm transition-all duration-500 flex items-center justify-center gap-3 active:scale-95 ${copied
                                     ? "bg-green-600 text-white shadow-lg shadow-green-600/20"
                                     : "bg-blue-900 text-white shadow-xl shadow-blue-900/10 hover:bg-blue-950"
                                     }`}
                             >
                                 {copied ? <CheckCircle2 size={18} strokeWidth={3} /> : <Copy size={18} strokeWidth={2.5} />}
-                                {copied ? "Copy Success" : "Get Gateway Link"}
+                                {copied ? "Copied!" : "Copy Link"}
                             </button>
                             <button
                                 onClick={handleShare}
@@ -196,16 +196,16 @@ export default function InvitePage() {
                 {/* Protocol Steps */}
                 <div className="w-full grid grid-cols-3 gap-4 px-2 text-center mb-10">
                     <div className="space-y-3">
-                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 font-black text-xs flex items-center justify-center mx-auto border border-blue-100">01</div>
-                        <p className="text-[9px] font-black text-blue-900/40 uppercase tracking-widest leading-tight">Authorize Gateway</p>
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center mx-auto border border-blue-100">01</div>
+                        <p className="text-[10px] font-bold text-slate-400 leading-tight">Share Link</p>
                     </div>
                     <div className="space-y-3">
-                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 font-black text-xs flex items-center justify-center mx-auto border border-blue-100">02</div>
-                        <p className="text-[9px] font-black text-blue-900/40 uppercase tracking-widest leading-tight">Clinical Onboarding</p>
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center mx-auto border border-blue-100">02</div>
+                        <p className="text-[10px] font-bold text-slate-400 leading-tight">Friends Join</p>
                     </div>
                     <div className="space-y-3">
-                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 font-black text-xs flex items-center justify-center mx-auto border border-blue-100">03</div>
-                        <p className="text-[9px] font-black text-blue-900/40 uppercase tracking-widest leading-tight">Verified Rewards</p>
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs flex items-center justify-center mx-auto border border-blue-100">03</div>
+                        <p className="text-[10px] font-bold text-slate-400 leading-tight">Earn Money</p>
                     </div>
                 </div>
 

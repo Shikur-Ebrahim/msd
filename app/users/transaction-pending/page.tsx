@@ -19,14 +19,14 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 const LOG_MESSAGES = [
-    "Initializing High-Priority Protocol...",
-    "Securing Medical Liaison Gateway...",
-    "Validating Clinical Credentials...",
-    "Synchronizing Distributed Nodes...",
-    "Processing Security Verification...",
-    "Internal Compliance Audit...",
-    "Cross-Referencing Pharma Records...",
-    "Awaiting Supervisory Approval..."
+    "Starting request...",
+    "Connecting to server...",
+    "Validating account...",
+    "Updating status...",
+    "Checking security...",
+    "Verifying details...",
+    "Finalizing process...",
+    "Almost done..."
 ];
 
 function PendingContent() {
@@ -94,7 +94,7 @@ function PendingContent() {
         return (
             <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
                 <Loader2 className="animate-spin text-green-600 w-12 h-12" strokeWidth={2.5} />
-                <span className="text-blue-900/40 font-black text-[10px] animate-pulse uppercase tracking-[0.3em]">Booting Protocol...</span>
+                <span className="text-blue-900/40 font-bold text-sm animate-pulse">Starting...</span>
             </div>
         );
     }
@@ -117,13 +117,13 @@ function PendingContent() {
                         <ChevronLeft size={22} />
                     </button>
                     <div className="flex flex-col">
-                        <h1 className="text-lg font-black text-blue-900 tracking-tight leading-none uppercase">Security Node</h1>
-                        <span className="text-[10px] font-black text-blue-900/40 tracking-[0.2em] uppercase mt-1">Verification Active</span>
+                        <h1 className="text-lg font-bold text-blue-900 leading-none">Processing</h1>
+                        <span className="text-[10px] text-blue-900/40 mt-1">Verification in progress</span>
                     </div>
                 </div>
-                <div className="px-5 py-2.5 rounded-2xl bg-blue-900 border border-blue-950 text-[10px] font-black tracking-widest text-white shadow-xl flex items-center gap-3">
+                <div className="px-5 py-2.5 rounded-2xl bg-blue-900 text-[11px] font-bold text-white shadow-xl flex items-center gap-3">
                     <Activity size={14} className="animate-pulse text-green-400" />
-                    MSD SEC {searchParams.get('type') === 'withdrawal' ? 'W-72' : 'R-10'}
+                    ID: {searchParams.get('type') === 'withdrawal' ? 'W-72' : 'R-10'}
                 </div>
             </header>
 
@@ -152,9 +152,9 @@ function PendingContent() {
                                 <div className="flex flex-col items-center gap-2">
                                     <div className="flex items-center gap-3">
                                         <Loader2 size={16} className="animate-spin text-blue-600" strokeWidth={3} />
-                                        <span className="text-[10px] font-black tracking-[0.3em] text-blue-900 uppercase">Processing</span>
+                                        <span className="text-[11px] font-bold text-blue-900">Processing</span>
                                     </div>
-                                    <span className="text-[9px] font-mono font-black text-blue-900/20 uppercase">Node: {Math.random().toString(36).substring(7).toUpperCase()}</span>
+                                    <span className="text-[10px] font-mono font-medium text-blue-900/20">Session: {Math.random().toString(36).substring(7).toUpperCase()}</span>
                                 </div>
                             </div>
 
@@ -173,19 +173,19 @@ function PendingContent() {
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce delay-100"></span>
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce delay-200"></span>
                             </div>
-                            <span className="text-[10px] font-black text-blue-900 tracking-widest uppercase">
-                                {searchParams.get('type') === 'withdrawal' ? 'Authorization Pending' : 'Review Underway'}
+                            <span className="text-[11px] font-bold text-blue-900">
+                                {searchParams.get('type') === 'withdrawal' ? 'Pending Approval' : 'Under Review'}
                             </span>
                         </div>
 
-                        <h1 className="text-4xl font-black text-blue-900 tracking-tight leading-none uppercase">
-                            Medical <br />
+                        <h1 className="text-4xl font-bold text-blue-900 tracking-tight leading-none">
+                            Request <br />
                             <span className="text-orange-500">Processing</span>
                         </h1>
 
-                        <p className="text-[11px] font-black text-blue-900/40 max-w-[280px] mx-auto leading-relaxed uppercase tracking-widest">
-                            Executing secure settlement through the clinical liaison protocol.
-                            Estimated latency: <span className="text-blue-900 underline decoration-blue-900/20 underline-offset-4 decoration-2">5-15 Mins</span>
+                        <p className="text-[13px] font-medium text-blue-900/40 max-w-[280px] mx-auto leading-relaxed">
+                            We are processing your request. Please wait.
+                            Estimated time: <span className="text-blue-900 underline underline-offset-4 decoration-2">5-15 mins</span>
                         </p>
                     </div>
 
@@ -199,7 +199,7 @@ function PendingContent() {
                             <div className="p-3 rounded-2xl bg-blue-100 border border-blue-200 text-blue-600 shadow-sm">
                                 <Cpu size={22} strokeWidth={2.5} />
                             </div>
-                            <h3 className="text-[10px] font-black tracking-[0.3em] text-blue-900/60 uppercase">System Diagnostics</h3>
+                            <h3 className="text-[11px] font-bold text-blue-900/60">System Diagnostics</h3>
                         </div>
 
                         <div className="space-y-5 font-mono">
@@ -208,7 +208,7 @@ function PendingContent() {
                                     key={idx}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className={`flex items-start gap-4 text-[10px] font-black ${idx === currentLog ? 'text-blue-900' : 'text-blue-900/20'}`}
+                                    className={`flex items-start gap-4 text-[11px] font-bold ${idx === currentLog ? 'text-blue-900' : 'text-blue-900/20'}`}
                                 >
                                     <span className="text-green-600">{`>>`}</span>
                                     <span>
@@ -226,10 +226,10 @@ function PendingContent() {
             <div className="fixed bottom-0 left-0 right-0 p-8 pb-12 bg-gradient-to-t from-white via-white to-transparent z-40 max-w-lg mx-auto w-full">
                 <button
                     onClick={() => router.push("/users/welcome")}
-                    className="w-full h-18 bg-blue-900 hover:bg-blue-950 text-white rounded-[2rem] font-black tracking-[0.3em] text-[11px] transition-all shadow-2xl flex items-center justify-center gap-4 group uppercase"
+                    className="w-full h-18 bg-blue-900 hover:bg-blue-950 text-white rounded-[2rem] font-bold text-sm transition-all shadow-2xl flex items-center justify-center gap-4 group"
                 >
                     <Home size={18} className="group-hover:-translate-y-1 transition-transform" />
-                    <span>Return to Headquarters</span>
+                    <span>Home</span>
                 </button>
             </div>
 
@@ -249,7 +249,7 @@ export default function TransactionPendingPage() {
         <Suspense fallback={
             <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
                 <Loader2 className="animate-spin text-blue-600 w-12 h-12" strokeWidth={2.5} />
-                <span className="text-blue-900/40 font-black text-[10px] animate-pulse uppercase tracking-[0.3em]">Deploying Gatekeeper...</span>
+                <span className="text-blue-900/40 font-bold text-sm animate-pulse">Loading...</span>
             </div>
         }>
             <PendingContent />

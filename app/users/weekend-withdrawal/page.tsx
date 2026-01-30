@@ -277,17 +277,17 @@ export default function WeekendWithdrawalPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <h3 className="text-2xl font-black text-blue-900 tracking-tight uppercase">Protocol Alert</h3>
-                                <p className="text-sm font-black text-blue-900/40 leading-relaxed px-2">
+                                <h3 className="text-2xl font-bold text-blue-900 tracking-tight">Withdrawal Alert</h3>
+                                <p className="text-sm font-medium text-blue-900/40 leading-relaxed px-2">
                                     {errorModal.message}
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => setErrorModal(null)}
-                                className="w-full py-6 bg-red-500 text-white rounded-[1.8rem] text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                                className="w-full py-6 bg-red-500 text-white rounded-[1.8rem] text-sm font-bold shadow-xl shadow-red-500/20 active:scale-95 transition-all"
                             >
-                                Acknowledge
+                                OK
                             </button>
                         </div>
                     </div>
@@ -302,8 +302,8 @@ export default function WeekendWithdrawalPage() {
                 >
                     <ChevronLeft size={24} />
                 </button>
-                <h1 className="text-xl font-black uppercase tracking-widest text-blue-900 leading-none text-center flex-1">
-                    Weekend Refund
+                <h1 className="text-xl font-bold text-blue-900 leading-none text-center flex-1">
+                    Weekend Withdrawal
                 </h1>
                 <div className="w-12" /> {/* Spacer */}
             </header>
@@ -330,8 +330,8 @@ export default function WeekendWithdrawalPage() {
                                         <Clock size={32} />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-[10px] font-black text-red-500 tracking-[0.2em] uppercase mb-1">Clinic Closed</p>
-                                        <p className="text-base font-black text-blue-900">
+                                        <p className="text-[10px] font-bold text-red-500 mb-1">Closed</p>
+                                        <p className="text-base font-bold text-blue-900">
                                             Opens at {withdrawalSettings.startTime} tomorrow
                                         </p>
                                     </div>
@@ -344,8 +344,8 @@ export default function WeekendWithdrawalPage() {
                                     <CheckCircle2 size={32} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-black text-orange-600 tracking-[0.2em] uppercase mb-1">Clinic Active</p>
-                                    <p className="text-base font-black text-blue-900">
+                                    <p className="text-[10px] font-bold text-orange-600 mb-1">Active</p>
+                                    <p className="text-base font-bold text-blue-900">
                                         Available until {withdrawalSettings.endTime}
                                     </p>
                                 </div>
@@ -360,7 +360,7 @@ export default function WeekendWithdrawalPage() {
                     <div className="bg-white rounded-[3rem] p-12 border border-orange-50 shadow-xl shadow-orange-900/5 relative overflow-hidden h-64 flex flex-col justify-center">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20"></div>
 
-                        <p className="text-blue-900/40 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Refund Amount</p>
+                        <p className="text-blue-900/40 text-[11px] font-bold mb-4">Amount</p>
                         <div className="flex items-baseline gap-4 relative z-10">
                             <input
                                 type="number"
@@ -369,7 +369,7 @@ export default function WeekendWithdrawalPage() {
                                 placeholder="0"
                                 className="w-full bg-transparent text-6xl font-black text-blue-900 placeholder:text-blue-900/10 outline-none border-none p-0 tabular-nums leading-none"
                             />
-                            <span className="text-blue-900/40 font-black uppercase tracking-widest text-base shrink-0">ETB</span>
+                            <span className="text-blue-900/40 font-bold text-base shrink-0">ETB</span>
                         </div>
 
                         <div className="mt-10 flex gap-2">
@@ -389,8 +389,8 @@ export default function WeekendWithdrawalPage() {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                     <div className="flex justify-between items-center p-6 rounded-[2rem] bg-orange-50/50 border border-orange-100">
-                        <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Weekend Balance</span>
-                        <span className="text-xl font-black text-blue-900 tabular-nums">
+                        <span className="text-[10px] font-bold text-blue-900/40 mb-1">Weekend Balance</span>
+                        <span className="text-xl font-bold text-blue-900 tabular-nums">
                             {Math.floor(totalWeekendBalance + (userData?.fixedWeekendBalance || 0)).toLocaleString()} <span className="text-[10px] text-blue-900/40">ETB</span>
                         </span>
                     </div>
@@ -398,19 +398,19 @@ export default function WeekendWithdrawalPage() {
                     <div className="space-y-4 px-2">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                                <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Clinical Fee</span>
-                                <div className="px-3 py-1 rounded-lg bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest leading-none">5%</div>
+                                <span className="text-[10px] font-bold text-blue-900/40">Withdrawal Fee</span>
+                                <div className="px-3 py-1 rounded-lg bg-orange-500 text-white text-[9px] font-bold leading-none">5%</div>
                             </div>
-                            <span className="text-sm font-black text-red-500 tabular-nums">-{fee.toLocaleString()} ETB</span>
+                            <span className="text-sm font-bold text-red-500 tabular-nums">-{fee.toLocaleString()} ETB</span>
                         </div>
                         <div className="h-[1px] bg-orange-50"></div>
                         <div className="flex justify-between items-end pt-2">
-                            <span className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-1">Actual yield</span>
+                            <span className="text-[10px] font-bold text-blue-900 mb-1">You will receive</span>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-orange-600 tabular-nums tracking-tighter">
+                                <span className="text-4xl font-bold text-orange-600 tabular-nums tracking-tighter">
                                     {actualReceipt.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </span>
-                                <span className="text-orange-600/40 font-black text-sm uppercase tracking-widest">ETB</span>
+                                <span className="text-orange-600/40 font-bold text-sm">ETB</span>
                             </div>
                         </div>
                     </div>
@@ -420,7 +420,7 @@ export default function WeekendWithdrawalPage() {
                 <section className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
                     <div className="flex items-center gap-3 px-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-900"></div>
-                        <h2 className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Receiving Medical account</h2>
+                        <h2 className="text-[10px] font-bold text-blue-900/40 items-center">Bank Account</h2>
                     </div>
 
                     {linkedBank ? (
@@ -437,8 +437,8 @@ export default function WeekendWithdrawalPage() {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-2xl font-black text-blue-900 truncate tracking-tight leading-none">{linkedBank.bankName}</h4>
-                                        <p className="text-[10px] font-black text-blue-900/40 tracking-[0.2em] uppercase mt-2">{linkedBank.holderName}</p>
+                                        <h4 className="text-2xl font-bold text-blue-900 truncate tracking-tight leading-none">{linkedBank.bankName}</h4>
+                                        <p className="text-[10px] font-bold text-blue-900/40 mt-2">{linkedBank.holderName}</p>
                                     </div>
                                     <div className="text-blue-900/10 group-hover/bank:text-blue-900 transition-all">
                                         <ChevronRight size={28} />
@@ -447,14 +447,14 @@ export default function WeekendWithdrawalPage() {
 
                                 <div className="pt-10 border-t border-orange-50 grid grid-cols-2 gap-8 relative z-10">
                                     <div className="space-y-2">
-                                        <p className="text-[10px] font-black text-blue-900/20 uppercase tracking-[0.15em]">Health ID No.</p>
-                                        <p className="text-base font-black text-blue-900 tracking-widest font-mono truncate">{linkedBank.accountNumber}</p>
+                                        <p className="text-[10px] font-bold text-blue-900/20">Account Number</p>
+                                        <p className="text-base font-bold text-blue-900 tracking-widest font-mono truncate">{linkedBank.accountNumber}</p>
                                     </div>
                                     <div className="space-y-2 text-right">
-                                        <p className="text-[10px] font-black text-blue-900/20 uppercase tracking-[0.15em]">Account Status</p>
+                                        <p className="text-[10px] font-bold text-blue-900/20">Status</p>
                                         <div className="flex items-center justify-end gap-2">
                                             <div className="w-2 h-2 bg-orange-500 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
-                                            <p className="text-xs font-black text-orange-600 uppercase tracking-widest">Medical Verified</p>
+                                            <p className="text-xs font-bold text-orange-600">Verified</p>
                                         </div>
                                     </div>
                                 </div>
@@ -468,8 +468,8 @@ export default function WeekendWithdrawalPage() {
                             <div className="w-20 h-20 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-6 group-hover/add:scale-110 transition-all text-orange-600 border border-orange-100">
                                 <CreditCard size={36} />
                             </div>
-                            <p className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-2">No Clinical account</p>
-                            <p className="text-sm text-blue-900/40 font-black tracking-tight">Tap to register receiving bank details</p>
+                            <p className="text-[10px] font-bold text-blue-900 mb-2">No account connected</p>
+                            <p className="text-sm text-blue-900/40 font-bold tracking-tight">Tap to register bank details</p>
                         </div>
                     )}
                 </section>
@@ -482,7 +482,7 @@ export default function WeekendWithdrawalPage() {
                         <div className="w-10 h-10 bg-orange-50 rounded-2xl flex items-center justify-center text-blue-900 border border-orange-100">
                             <AlertCircle size={22} />
                         </div>
-                        <h3 className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em]">Clinical Rules</h3>
+                        <h3 className="text-[11px] font-bold text-blue-900">Rules</h3>
                     </div>
 
                     <ul className="space-y-8">
@@ -500,8 +500,8 @@ export default function WeekendWithdrawalPage() {
                                         <span className="text-[11px] font-black transition-colors">{i + 1}</span>
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-black text-blue-900/40 leading-relaxed group-hover/tip:text-blue-900 transition-all tracking-tight">
-                                            <span className="text-blue-900/20 mr-1 uppercase tracking-widest">{label}:</span> {val.join(": ")}
+                                        <p className="text-xs font-bold text-blue-900/40 leading-relaxed group-hover/tip:text-blue-900 transition-all tracking-tight">
+                                            <span className="text-blue-900/20 mr-1">{label}:</span> {val.join(": ")}
                                         </p>
                                     </div>
                                 </li>
@@ -515,10 +515,10 @@ export default function WeekendWithdrawalPage() {
             <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl p-8 pb-12 border-t border-orange-50 shadow-[0_-20px_50px_rgba(0,0,0,0.05)] relative z-[60]">
                 <button
                     onClick={handleWithdrawClick}
-                    className="w-full bg-orange-500 text-white py-7 rounded-[2.5rem] font-black uppercase tracking-[0.25em] text-xs shadow-xl shadow-orange-500/20 hover:shadow-2xl hover:bg-orange-600 transition-all duration-500 flex items-center justify-center gap-4 group"
+                    className="w-full bg-orange-500 text-white py-7 rounded-[2.5rem] font-bold text-sm shadow-xl shadow-orange-500/20 hover:shadow-2xl hover:bg-orange-600 transition-all duration-500 flex items-center justify-center gap-4 group"
                 >
                     <Lock size={20} className="group-hover:scale-110 transition-transform" />
-                    <span>Initiate refund</span>
+                    <span>Withdraw Now</span>
                 </button>
             </div>
         </div>

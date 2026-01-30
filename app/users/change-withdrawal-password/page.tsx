@@ -89,18 +89,18 @@ function ChangePasswordContent() {
         try {
             if (step === "enter_old") {
                 if (input === existingPass) {
-                    toast.success("Identity Protocol Verified");
+                    toast.success("Verified");
                     setStep("create_new");
                     setInput("");
                 } else {
                     triggerShake();
-                    setErrorMsg("Invalid PIN! Medical authorization failed.");
+                    setErrorMsg("Invalid PIN! Please try again.");
                     setInput("");
                 }
                 setSubmitting(false);
             } else if (step === "create_new") {
                 if (hasExistingPass && input === existingPass) {
-                    setErrorMsg("New PIN must differ from current protocol.");
+                    setErrorMsg("New PIN must be different.");
                     triggerShake();
                     setInput("");
                     setSubmitting(false);
@@ -119,7 +119,7 @@ function ChangePasswordContent() {
                     setShowSuccess(true);
                 } else {
                     triggerShake();
-                    setErrorMsg("Synchronization failed! PIN mismatch.");
+                    setErrorMsg("PIN mismatch. Please try again.");
                     setInput("");
                     setSubmitting(false);
                 }
@@ -127,7 +127,7 @@ function ChangePasswordContent() {
 
         } catch (error) {
             console.error(error);
-            toast.error("Clinical system error");
+            toast.error("System error");
             setSubmitting(false);
         }
     };
@@ -157,27 +157,27 @@ function ChangePasswordContent() {
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="w-full max-w-sm bg-white rounded-[3.5rem] p-12 border border-blue-50 shadow-3xl text-center relative z-10 overflow-hidden"
+                    className="w-full max-w-sm bg-white rounded-[2.5rem] p-10 border border-blue-50 shadow-3xl text-center relative z-10 overflow-hidden"
                 >
-                    <div className="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600"></div>
 
-                    <div className="w-28 h-28 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-8 shadow-inner">
-                        <CheckCircle2 size={56} className="text-blue-600" strokeWidth={2.5} />
+                    <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <CheckCircle2 size={48} className="text-blue-600" />
                     </div>
 
-                    <div className="space-y-4">
-                        <h2 className="text-3xl font-black text-blue-900 uppercase tracking-tight leading-none italic">Node Secured</h2>
-                        <p className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em] leading-relaxed">
-                            Clinical disbursement PIN has been successfully re-encrypted.
+                    <div className="space-y-3">
+                        <h2 className="text-2xl font-bold text-blue-900 leading-none">PIN Updated</h2>
+                        <p className="text-sm text-blue-900/40 leading-relaxed">
+                            Your withdrawal PIN has been updated successfully.
                         </p>
                     </div>
 
-                    <div className="w-full pt-10">
+                    <div className="w-full pt-8">
                         <button
                             onClick={() => router.back()}
-                            className="w-full h-18 bg-blue-900 hover:bg-blue-950 text-white rounded-[2.2rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-blue-900/10 transition-all active:scale-95"
+                            className="w-full h-14 bg-blue-900 hover:bg-blue-950 text-white rounded-2xl font-bold transition-all active:scale-95"
                         >
-                            Confirm & Path Back
+                            Done
                         </button>
                     </div>
                 </motion.div>
@@ -214,13 +214,12 @@ function ChangePasswordContent() {
             </motion.div>
 
             {/* Title & Instructions */}
-            <div className="space-y-4 mb-14 max-w-xs mx-auto relative z-10 text-center">
-                <h2 className="text-4xl font-black uppercase text-blue-900 tracking-tighter leading-none italic">
-                    {step === "enter_old" ? "Verify Identity" : step === "create_new" ? "Define PIN" : "Verify PIN"}
+            <div className="space-y-2 mb-10 max-w-xs mx-auto relative z-10 text-center">
+                <h2 className="text-3xl font-bold text-blue-900 leading-none">
+                    {step === "enter_old" ? "Verify PIN" : step === "create_new" ? "Create PIN" : "Confirm PIN"}
                 </h2>
-                <div className="h-1.5 w-12 bg-blue-600/10 mx-auto rounded-full"></div>
-                <p className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.3em] leading-relaxed">
-                    {step === "enter_old" ? "Authorize clinical node via existing credential." : step === "create_new" ? "Construct new 4-digit disbursement key." : "Re-enter new credential to finalize encryption."}
+                <p className="text-sm font-medium text-blue-900/40 leading-relaxed px-4">
+                    {step === "enter_old" ? "Enter your current 4-digit PIN." : step === "create_new" ? "Enter your new 4-digit PIN." : "Enter your new PIN again to confirm."}
                 </p>
             </div>
 
@@ -245,10 +244,10 @@ function ChangePasswordContent() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="bg-red-50 border border-red-100 text-red-600 px-6 py-3 rounded-2xl flex items-center gap-3"
+                            className="bg-red-50 border border-red-100 text-red-600 px-5 py-2.5 rounded-xl flex items-center gap-2"
                         >
-                            <AlertCircle size={16} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">{errorMsg}</span>
+                            <AlertCircle size={14} />
+                            <span className="text-xs font-semibold">{errorMsg}</span>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -260,7 +259,7 @@ function ChangePasswordContent() {
                     <button
                         key={num}
                         onClick={() => handleNumClick(num.toString())}
-                        className="w-18 h-18 rounded-full text-3xl font-black text-blue-900 hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
+                        className="w-16 h-16 rounded-full text-2xl font-bold text-blue-900 hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
                     >
                         {num}
                     </button>
@@ -268,7 +267,7 @@ function ChangePasswordContent() {
                 <div className="w-18 h-18"></div>
                 <button
                     onClick={() => handleNumClick("0")}
-                    className="w-18 h-18 rounded-full text-3xl font-black text-blue-900 hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
+                    className="w-16 h-16 rounded-full text-2xl font-bold text-blue-900 hover:bg-blue-50 active:scale-90 transition-all flex items-center justify-center"
                 >
                     0
                 </button>
@@ -281,18 +280,18 @@ function ChangePasswordContent() {
             </div>
 
             {/* Action Button */}
-            <div className="w-full max-w-[340px] relative z-20">
+            <div className="w-full max-w-[320px] relative z-20">
                 <button
                     onClick={handleAction}
                     disabled={input.length !== 4 || submitting}
-                    className="w-full h-20 bg-blue-900 disabled:opacity-30 disabled:grayscale text-white rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-4"
+                    className="w-full h-16 bg-blue-900 disabled:opacity-30 disabled:grayscale text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-3 active:scale-95 shadow-xl shadow-blue-900/10"
                 >
                     {submitting ? (
-                        <Loader2 className="animate-spin" size={24} />
+                        <Loader2 className="animate-spin" size={20} />
                     ) : (
                         <>
-                            <Shield size={18} strokeWidth={2.5} />
-                            <span>Authorize Protocol</span>
+                            <Shield size={20} />
+                            <span>Confirm PIN</span>
                         </>
                     )}
                 </button>
@@ -313,7 +312,7 @@ function ChangePasswordContent() {
 
             {/* Bottom Logistics */}
             <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none opacity-20 z-0 select-none">
-                <span className="text-[10px] font-black uppercase tracking-[0.8em] text-blue-900">AUTHORITY DISBURSEMENT</span>
+                <span className="text-[10px] font-semibold text-blue-900">Secure PIN Setup</span>
             </div>
         </div>
     );

@@ -70,65 +70,64 @@ export default function DownloadAppPage() {
             </div>
 
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-3xl px-6 h-20 flex items-center justify-between border-b border-blue-50 max-w-lg mx-auto">
+            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-3xl px-6 h-20 flex items-center justify-between border-b border-blue-50 max-w-lg mx-auto w-full">
                 <div className="flex items-center gap-4">
                     <button onClick={() => router.back()} className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white border border-blue-100 text-blue-900 transition-all active:scale-95 shadow-sm">
                         <ChevronLeft size={22} className="text-blue-900" />
                     </button>
                     <div className="flex flex-col">
-                        <h1 className="text-lg font-black text-blue-900 tracking-tight leading-none uppercase">Digital Gateway</h1>
-                        <span className="text-[10px] font-black text-blue-900/40 tracking-[0.2em] uppercase mt-1">MSD App Store</span>
+                        <h1 className="text-lg font-bold text-blue-900 leading-none">Download App</h1>
+                        <span className="text-[10px] font-medium text-blue-900/40 mt-1">MSD Mobile Experience</span>
                     </div>
                 </div>
             </header>
 
             <main className="flex-1 max-w-lg mx-auto w-full relative z-10 overflow-y-auto pb-32">
                 {/* Hero App Branding Section */}
-                <section className="px-6 py-12 flex gap-8 items-center">
+                <section className="px-6 py-12 flex flex-col items-center text-center">
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="w-28 h-28 shrink-0 rounded-[2.5rem] bg-white border border-blue-100 p-5 shadow-2xl shadow-blue-900/5 overflow-hidden relative group"
+                        className="w-32 h-32 rounded-[2.5rem] bg-white border border-blue-50 p-6 shadow-2xl shadow-blue-900/5 mb-8 relative group"
                     >
                         <img src="/msd-logo.png" alt="MSD App" className="w-full h-full object-contain relative z-10" />
-                        <div className="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="absolute inset-0 bg-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem]"></div>
                     </motion.div>
-                    <div className="flex flex-col">
-                        <div className="bg-green-50 text-green-600 w-fit px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest mb-3 border border-green-100">Official Clinical Release</div>
-                        <h1 className="text-3xl font-black tracking-tighter text-blue-900 leading-none mb-3">MSD Portal</h1>
-                        <p className="text-[10px] font-black text-blue-900/30 uppercase tracking-[0.15em]">Secure Medical Operation Terminal</p>
+                    <div className="flex flex-col items-center">
+                        <h1 className="text-4xl font-bold tracking-tight text-blue-900 leading-none mb-3">MSD Mobile</h1>
                     </div>
                 </section>
 
                 {/* Metrics */}
                 <section className="px-6">
-                    <div className="bg-blue-50/50 backdrop-blur-md rounded-[2.5rem] p-8 border border-blue-100 grid grid-cols-3 gap-6 shadow-inner">
-                        <div className="flex flex-col items-center gap-2">
+                    <div className="bg-white rounded-[2rem] p-6 border border-blue-50/50 grid grid-cols-4 gap-2 shadow-sm">
+                        <div className="flex flex-col items-center gap-1.5">
                             <div className="flex items-center gap-1">
-                                <span className="text-lg font-black text-blue-900">4.9</span>
+                                <span className="text-base font-bold text-blue-900">4.9</span>
                                 <Star size={12} fill="#1E3A8A" className="text-blue-900" />
                             </div>
-                            <span className="text-[9px] text-blue-900/40 font-black uppercase tracking-widest">Medical Grade</span>
+                            <span className="text-[10px] text-blue-900/40 font-bold whitespace-nowrap">12K REVIEWS</span>
                         </div>
-                        <div className="flex flex-col items-center gap-2 border-x border-blue-100">
-                            <Activity size={20} className="text-blue-600" />
-                            <span className="text-[9px] text-blue-900/40 font-black uppercase tracking-widest">Verified 24/7</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="w-6 h-6 rounded-lg bg-blue-950 text-white flex items-center justify-center">
-                                <span className="text-[10px] font-black italic">A</span>
+                        <div className="flex flex-col items-center gap-1.5 border-x border-blue-100/50">
+                            <div className="flex items-center gap-1">
+                                <Download size={14} className="text-blue-900" />
+                                <span className="text-base font-bold text-blue-900">32 MB</span>
                             </div>
-                            <span className="text-[9px] text-blue-900/40 font-black uppercase tracking-widest">Class I Sec</span>
+                            <span className="text-[10px] text-blue-900/40 font-bold whitespace-nowrap">SIZE</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1.5 border-r border-blue-100/50">
+                            <div className="w-6 h-6 rounded-lg bg-blue-50 text-blue-900 flex items-center justify-center border border-blue-200">
+                                <span className="text-[10px] font-bold leading-none">3+</span>
+                            </div>
+                            <span className="text-[10px] text-blue-900/40 font-bold whitespace-nowrap">PEGI 3</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-1.5">
+                            <span className="text-base font-bold text-blue-900">500K+</span>
+                            <span className="text-[10px] text-blue-900/40 font-bold whitespace-nowrap">DOWNLOADS</span>
                         </div>
                     </div>
                 </section>
 
-                {/* Info Text */}
-                <section className="px-10 py-10 text-center">
-                    <p className="text-[11px] font-black text-blue-900/40 uppercase tracking-widest leading-relaxed">
-                        Authorized digital terminal for high-priority medicine distribution and clinical finance management.
-                    </p>
-                </section>
 
                 {/* Primary Action Section */}
                 <section className="px-6 space-y-4">
@@ -137,27 +136,27 @@ export default function DownloadAppPage() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={handleDownload}
-                            className="w-full h-18 py-6 bg-orange-500 rounded-[1.8rem] flex items-center justify-center gap-4 shadow-xl shadow-orange-500/20 group transition-all"
+                            className="w-full h-20 bg-orange-500 rounded-[2rem] flex items-center justify-center gap-4 shadow-xl shadow-orange-500/20 group transition-all"
                         >
-                            <CloudDownload size={24} className="text-white group-hover:translate-y-1 transition-transform" strokeWidth={2.5} />
-                            <span className="text-sm font-black text-white tracking-[0.25em] uppercase">Authorize Access</span>
+                            <CloudDownload size={28} className="text-white" />
+                            <span className="text-xl font-bold text-white tracking-wider uppercase">DOWNLOAD APP</span>
                         </motion.button>
                     )}
 
                     {installStatus === 'installing' && (
-                        <div className="w-full h-18 py-6 bg-blue-50 rounded-[1.8rem] border border-blue-100 flex items-center justify-center gap-4">
-                            <Loader2 size={24} className="text-blue-600 animate-spin" strokeWidth={2.5} />
-                            <span className="text-sm font-black text-blue-900/40 tracking-[0.15em] uppercase">Booting Gateway...</span>
+                        <div className="w-full h-18 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center gap-3">
+                            <Loader2 size={24} className="text-blue-600 animate-spin" />
+                            <span className="text-base font-bold text-blue-900/40">Starting Download...</span>
                         </div>
                     )}
 
                     {installStatus === 'installed' && (
                         <button
                             onClick={() => router.push('/users/welcome')}
-                            className="w-full h-18 py-6 bg-green-600 rounded-[1.8rem] flex items-center justify-center gap-4 shadow-xl shadow-green-600/20"
+                            className="w-full h-18 bg-green-600 rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-green-600/20"
                         >
-                            <CheckCircle2 size={24} className="text-white" strokeWidth={3} />
-                            <span className="text-sm font-black text-white tracking-[0.25em] uppercase">Launch Terminal</span>
+                            <CheckCircle2 size={24} className="text-white" />
+                            <span className="text-lg font-bold text-white">Open App</span>
                         </button>
                     )}
                 </section>
@@ -182,8 +181,8 @@ export default function DownloadAppPage() {
                                     <div className="w-20 h-20 mx-auto mb-6 rounded-[2rem] bg-orange-50 flex items-center justify-center border border-orange-100">
                                         <Smartphone size={36} className="text-orange-500" />
                                     </div>
-                                    <h2 className="text-xl font-black text-blue-900 uppercase tracking-tight">Installation Protocol</h2>
-                                    <p className="text-[10px] font-black text-blue-900/30 uppercase tracking-widest mt-2">Manual deployment required</p>
+                                    <h2 className="text-2xl font-bold text-blue-900">How to Install</h2>
+                                    <p className="text-xs font-semibold text-blue-900/40 mt-1">Follow these simple steps</p>
                                 </div>
 
                                 <div className="space-y-6">
@@ -192,20 +191,20 @@ export default function DownloadAppPage() {
                                         { step: "02", text: "Select 'Add to Home Screen'", icon: <MoreVertical size={12} /> },
                                         { step: "03", text: "Authorize deployment", icon: <CheckCircle2 size={12} /> }
                                     ].map((s, i) => (
-                                        <div key={i} className="flex gap-5 items-center">
-                                            <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
-                                                <span className="text-xs font-black text-blue-600">{s.step}</span>
+                                        <div key={i} className="flex gap-4 items-center">
+                                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
+                                                <span className="text-sm font-bold text-blue-600">{s.step}</span>
                                             </div>
-                                            <p className="text-[10px] font-black text-blue-900 uppercase tracking-widest leading-none">{s.text}</p>
+                                            <p className="text-sm font-bold text-blue-900/80">{s.text}</p>
                                         </div>
                                     ))}
                                 </div>
 
                                 <button
                                     onClick={() => setShowInstruction(false)}
-                                    className="w-full h-16 bg-blue-900 hover:bg-blue-950 rounded-[1.5rem] text-white font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-900/10"
+                                    className="w-full h-16 bg-blue-900 hover:bg-blue-950 rounded-2xl text-white font-bold transition-all shadow-xl shadow-blue-900/10"
                                 >
-                                    Understood
+                                    Got it
                                 </button>
                             </div>
                         </motion.div>
@@ -215,7 +214,7 @@ export default function DownloadAppPage() {
 
             {/* Bottom Logistics */}
             <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none opacity-20">
-                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-900">Secure Download</span>
+                <span className="text-[10px] font-bold text-blue-900">Secure Download</span>
             </div>
         </div>
     );

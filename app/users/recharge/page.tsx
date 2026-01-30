@@ -34,9 +34,19 @@ function RechargeContent() {
     useEffect(() => {
         const fetchProductPrices = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, "Products"));
+                const [productsSnap, weekendSnap] = await Promise.all([
+                    getDocs(collection(db, "Products")),
+                    getDocs(collection(db, "WeekendProducts"))
+                ]);
+
                 const prices: number[] = [];
-                querySnapshot.forEach((doc) => {
+
+                productsSnap.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.price) prices.push(Number(data.price));
+                });
+
+                weekendSnap.forEach((doc) => {
                     const data = doc.data();
                     if (data.price) prices.push(Number(data.price));
                 });
@@ -120,12 +130,12 @@ function RechargeContent() {
             <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-2xl z-50 px-6 py-6 flex items-center justify-between border-b border-blue-50">
                 <button
                     onClick={() => router.back()}
-                    className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-blue-100 text-blue-900 active:scale-90 transition-all shadow-sm"
+                    className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-blue-100 text-blue-900 active:scale-90 transition-all shadow-sm"
                 >
                     <ChevronLeft size={24} />
                 </button>
-                <h1 className="text-xl font-black uppercase tracking-widest text-blue-900 leading-none">
-                    Medicine funding
+                <h1 className="text-xl font-bold text-blue-900">
+                    Deposit
                 </h1>
                 <div className="w-12" /> {/* Spacer */}
             </header>
@@ -136,12 +146,12 @@ function RechargeContent() {
                     <div className="bg-white rounded-[3rem] p-10 shadow-xl shadow-blue-900/5 border border-blue-50 relative overflow-hidden h-64 flex flex-col justify-center">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -mr-16 -mt-16"></div>
 
-                        <p className="text-blue-900/40 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Specified funding amount</p>
+                        <p className="text-slate-400 text-sm font-medium mb-4">Deposit Amount</p>
                         <div className="flex items-baseline gap-4">
                             <span className="text-blue-900 text-6xl font-black tracking-tighter tabular-nums leading-none">
                                 {Number(amount).toLocaleString()}
                             </span>
-                            <span className="text-blue-900/40 font-black uppercase tracking-widest text-base">ETB</span>
+                            <span className="text-blue-900/40 font-bold uppercase tracking-widest text-base">ETB</span>
                         </div>
 
                         <div className="mt-10 flex gap-2">
@@ -159,7 +169,7 @@ function RechargeContent() {
                 {/* Preset Grid */}
                 <section className="space-y-6">
                     <div className="flex items-center justify-between px-1">
-                        <h2 className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Medical Tier options</h2>
+                        <h2 className="text-sm font-bold text-slate-800">Select Amount</h2>
                         {fetchingPresets && <Loader2 size={16} className="animate-spin text-blue-900/20" />}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -169,7 +179,7 @@ function RechargeContent() {
                                 <button
                                     key={val}
                                     onClick={() => handleAmountSelect(val)}
-                                    className={`relative py-7 rounded-[2rem] font-black text-sm transition-all active:scale-95 group overflow-hidden ${isSelected
+                                    className={`relative py-7 rounded-[2rem] font-bold text-lg transition-all active:scale-95 group overflow-hidden ${isSelected
                                         ? "bg-orange-500 text-white shadow-xl shadow-orange-500/20 scale-[1.02]"
                                         : "bg-blue-50/50 text-blue-900/60 border border-blue-100 hover:border-blue-400 shadow-none"
                                         }`}
@@ -185,7 +195,7 @@ function RechargeContent() {
                 <section className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
                     <div className="flex items-center gap-2 px-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-900"></div>
-                        <h2 className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Manual Entry (Min. {minDeposit.toLocaleString()})</h2>
+                        <h2 className="text-sm font-bold text-slate-800">Custom Amount (Min. {minDeposit.toLocaleString()})</h2>
                     </div>
 
                     <div className="relative group">
@@ -194,10 +204,10 @@ function RechargeContent() {
                         </div>
                         <input
                             type="text"
-                            placeholder="Enter funding amount..."
+                            placeholder="Enter amount..."
                             value={customAmount}
                             onChange={handleCustomAmountChange}
-                            className="w-full bg-white border-2 border-blue-50 rounded-[2.2rem] py-8 pl-18 pr-8 text-2xl font-black text-blue-900 placeholder:text-blue-900/10 focus:outline-none focus:border-blue-900/20 transition-all shadow-xl shadow-blue-900/5 px-16"
+                            className="w-full bg-white border-2 border-blue-50 rounded-[2.2rem] py-8 pl-18 pr-8 text-2xl font-bold text-blue-900 placeholder:text-blue-900/10 focus:outline-none focus:border-blue-900/20 transition-all shadow-xl shadow-blue-900/5 px-16"
                         />
                     </div>
                 </section>
@@ -210,20 +220,20 @@ function RechargeContent() {
                         <div className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
                             <Info size={22} />
                         </div>
-                        <h3 className="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em]">Safety protocols</h3>
+                        <h3 className="text-sm font-bold text-slate-800">Guidelines</h3>
                     </div>
 
                     <ul className="space-y-6">
                         {[
-                            "Verify payment accounts only through this clinical interface.",
-                            "Account rotations occur daily. Use fresh information for each claim.",
-                            "Keep your 12-digit transaction hash secure for verification."
+                            "Verify payment accounts only through this official interface.",
+                            "Account rotations occur daily. Use fresh information for each deposit.",
+                            "Keep your transaction details secure for verification."
                         ].map((tip, i) => (
                             <li key={i} className="flex gap-4 items-start group/tip">
                                 <div className="w-6 h-6 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5 group-hover/tip:bg-blue-900 group-hover/tip:text-white transition-all">
-                                    <span className="text-[10px] font-black transition-colors">{i + 1}</span>
+                                    <span className="text-xs font-bold transition-colors">{i + 1}</span>
                                 </div>
-                                <p className="text-[11px] font-black text-blue-900/40 leading-relaxed group-hover/tip:text-blue-900 transition-all">{tip}</p>
+                                <p className="text-sm text-slate-400 leading-relaxed group-hover/tip:text-blue-900 transition-all">{tip}</p>
                             </li>
                         ))}
                     </ul>
@@ -233,9 +243,9 @@ function RechargeContent() {
                 <div className="pt-8">
                     <button
                         onClick={handleNext}
-                        className="w-full bg-orange-500 text-white py-7 rounded-[2.2rem] font-black uppercase tracking-[0.2em] text-[11px] shadow-xl shadow-orange-500/20 hover:shadow-2xl hover:bg-orange-600 transition-all duration-500 flex items-center justify-center gap-4 group"
+                        className="w-full bg-orange-500 text-white py-7 rounded-[2.2rem] font-bold text-lg shadow-xl shadow-orange-500/20 hover:shadow-2xl hover:bg-orange-600 transition-all duration-500 flex items-center justify-center gap-4 group"
                     >
-                        <span>Select payment method</span>
+                        <span>Next Step</span>
                         <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
                     </button>
                 </div>
@@ -253,17 +263,17 @@ function RechargeContent() {
                             </div>
 
                             <div className="space-y-4">
-                                <h2 className="text-2xl font-black text-blue-900 uppercase tracking-tight">Security Alert</h2>
-                                <p className="text-blue-900/40 text-sm font-black leading-relaxed px-2">
+                                <h2 className="text-2xl font-bold text-blue-900">Alert</h2>
+                                <p className="text-sm text-slate-400 leading-relaxed px-2">
                                     {errorMsg}
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => setShowErrorModal(false)}
-                                className="w-full bg-red-500 text-white py-6 rounded-[1.8rem] font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                                className="w-full bg-red-500 text-white py-6 rounded-[1.8rem] font-bold text-lg shadow-xl shadow-red-500/20 active:scale-95 transition-all"
                             >
-                                Acknowledge
+                                Ok
                             </button>
                         </div>
                     </div>

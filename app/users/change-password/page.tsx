@@ -26,26 +26,26 @@ export default function ChangePasswordPage() {
 
         try {
             if (!currentPassword || !newPassword || !confirmPassword) {
-                toast.error("All medical credentials are required");
+                toast.error("All fields are required");
                 setLoading(false);
                 return;
             }
 
             if (newPassword.length < 6) {
-                toast.error("New protocol must be at least 6 characters");
+                toast.error("New password must be at least 6 characters");
                 setLoading(false);
                 return;
             }
 
             if (newPassword !== confirmPassword) {
-                toast.error("Clinical confirmation does not match");
+                toast.error("Passwords do not match");
                 setLoading(false);
                 return;
             }
 
             const user = auth.currentUser;
             if (!user || !user.email) {
-                toast.error("Liaison session expired. Please re-authenticate.");
+                toast.error("Session expired. Please log in again.");
                 router.push("/");
                 return;
             }
@@ -57,24 +57,24 @@ export default function ChangePasswordPage() {
             await addDoc(collection(db, "UserNotifications"), {
                 userId: user.uid,
                 type: "security_update",
-                message: "Medical access protocol updated successfully",
+                message: "Password changed successfully",
                 createdAt: new Date(),
                 read: false
             });
 
             setSuccess(true);
-            toast.success("Security protocol updated!");
+            toast.success("Password updated!");
 
             setTimeout(() => {
                 router.push("/users/profile");
             }, 3000);
 
         } catch (error: any) {
-            console.error("Security update error:", error);
+            console.error("Password update error:", error);
             if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
-                toast.error("Invalid current credentials");
+                toast.error("Invalid current password");
             } else {
-                toast.error("Security protocol breach. Please try again.");
+                toast.error("Something went wrong. Please try again.");
             }
         } finally {
             setLoading(false);
@@ -110,12 +110,12 @@ export default function ChangePasswordPage() {
                             </div>
 
                             <div className="space-y-3">
-                                <h2 className="text-3xl font-black text-blue-900 tracking-tight leading-none uppercase">Gatekeeper Secured</h2>
-                                <p className="text-[10px] font-black text-green-600 tracking-[0.2em] uppercase">Protocol Synchronized</p>
+                                <h2 className="text-3xl font-bold text-blue-900 leading-none">Password Changed</h2>
+                                <p className="text-sm font-semibold text-green-600">Success</p>
                             </div>
 
-                            <p className="text-[11px] text-blue-900/40 leading-relaxed font-black uppercase tracking-widest px-4">
-                                Your clinical access protocol has been successfully re-encrypted. Redirecting to headquarters...
+                            <p className="text-sm text-blue-900/60 leading-relaxed px-4">
+                                Your password has been successfully updated. Redirecting to your profile...
                             </p>
 
                             <Loader2 className="w-10 h-10 animate-spin text-blue-600 mx-auto" strokeWidth={3} />
@@ -134,8 +134,8 @@ export default function ChangePasswordPage() {
                         <ChevronLeft size={22} className="text-blue-900 group-hover:-translate-x-0.5 transition-transform" />
                     </button>
                     <div className="flex flex-col">
-                        <h1 className="text-lg font-black text-blue-900 tracking-tight leading-none uppercase">Security Node</h1>
-                        <span className="text-[10px] font-black text-blue-900/40 tracking-[0.2em] uppercase mt-1">Access Maintenance</span>
+                        <h1 className="text-lg font-bold text-blue-900 leading-none">Change Password</h1>
+                        <span className="text-[10px] font-medium text-blue-900/40 mt-1">Update your account password</span>
                     </div>
                 </div>
                 <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">
@@ -152,9 +152,9 @@ export default function ChangePasswordPage() {
                             <KeyRound size={28} strokeWidth={2.5} />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-[10px] font-black text-white/60 tracking-[0.2em] uppercase">Protocol Enforcement</h3>
-                            <p className="text-[11px] text-white/40 leading-relaxed font-black uppercase tracking-widest">
-                                Establish a complex clinical key. Minimum 6-character entropy required for medical-grade security.
+                            <h3 className="text-xs font-bold text-white/60">Security Rules</h3>
+                            <p className="text-xs text-white/40 leading-relaxed">
+                                Choose a strong password. At least 6 characters are required for your security.
                             </p>
                         </div>
                     </div>
@@ -164,12 +164,12 @@ export default function ChangePasswordPage() {
                 <form onSubmit={handleChangePassword} className="space-y-8 pb-32">
                     {/* Inputs */}
                     {[
-                        { label: "Existing Key", value: currentPassword, setter: setCurrentPassword, show: showCurrentPassword, setShow: setShowCurrentPassword, placeholder: "Enter current clinical key" },
-                        { label: "New Node Key", value: newPassword, setter: setNewPassword, show: showNewPassword, setShow: setShowNewPassword, placeholder: "Define new node key" },
-                        { label: "Verify New Key", value: confirmPassword, setter: setConfirmPassword, show: showConfirmPassword, setShow: setShowConfirmPassword, placeholder: "Re-encrypt new key" }
+                        { label: "Current Password", value: currentPassword, setter: setCurrentPassword, show: showCurrentPassword, setShow: setShowCurrentPassword, placeholder: "Enter current password" },
+                        { label: "New Password", value: newPassword, setter: setNewPassword, show: showNewPassword, setShow: setShowNewPassword, placeholder: "Enter new password" },
+                        { label: "Confirm New Password", value: confirmPassword, setter: setConfirmPassword, show: showConfirmPassword, setShow: setShowConfirmPassword, placeholder: "Enter new password again" }
                     ].map((field, i) => (
                         <div key={i} className="space-y-3">
-                            <label className="text-[10px] font-black text-blue-900/30 uppercase tracking-[0.2em] pl-2 uppercase">
+                            <label className="text-sm font-medium text-blue-900/60 pl-2">
                                 {field.label}
                             </label>
                             <div className="relative group/input">
@@ -181,7 +181,7 @@ export default function ChangePasswordPage() {
                                     value={field.value}
                                     onChange={(e) => field.setter(e.target.value)}
                                     placeholder={field.placeholder}
-                                    className="w-full h-18 pl-14 pr-14 rounded-[1.5rem] bg-blue-50 border border-blue-100 focus:border-blue-300 focus:bg-white focus:outline-none text-blue-900 text-sm font-black transition-all shadow-inner placeholder:text-blue-900/10"
+                                    className="w-full h-18 pl-14 pr-14 rounded-[1.5rem] bg-blue-50 border border-blue-100 focus:border-blue-300 focus:bg-white focus:outline-none text-blue-900 text-sm font-bold transition-all shadow-inner placeholder:text-blue-900/10"
                                 />
                                 <button
                                     type="button"
@@ -196,18 +196,18 @@ export default function ChangePasswordPage() {
 
                     {/* Requirements */}
                     <div className="bg-white rounded-[2rem] p-8 border border-blue-50 shadow-inner space-y-5">
-                        <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-[0.3em] block mb-2">Gatekeeper Logic:</span>
+                        <span className="text-[11px] font-bold text-blue-900/20 block mb-2">Password Requirements:</span>
                         <div className="grid grid-cols-1 gap-4">
                             {[
-                                { met: newPassword.length >= 6, text: "Minimum 6-Character Entropy" },
-                                { met: newPassword && confirmPassword && newPassword === confirmPassword, text: "Cipher Confirmation Matched" },
-                                { met: newPassword && currentPassword && newPassword !== currentPassword, text: "Unique Node Key Rotation" }
+                                { met: newPassword.length >= 6, text: "At least 6 characters" },
+                                { met: newPassword && confirmPassword && newPassword === confirmPassword, text: "Passwords match" },
+                                { met: newPassword && currentPassword && newPassword !== currentPassword, text: "Different from current password" }
                             ].map((req, idx) => (
                                 <div key={idx} className={`flex items-center gap-4 transition-all duration-500 ${req.met ? 'translate-x-1' : 'opacity-40'}`}>
                                     <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${req.met ? 'bg-green-50 border-green-200 text-green-600' : 'border-blue-100 text-blue-900/20'}`}>
                                         <CheckCircle2 size={12} strokeWidth={3} />
                                     </div>
-                                    <span className={`text-[10px] font-black uppercase tracking-widest ${req.met ? 'text-blue-900' : 'text-blue-900/40'}`}>{req.text}</span>
+                                    <span className={`text-xs font-semibold ${req.met ? 'text-blue-900' : 'text-blue-900/40'}`}>{req.text}</span>
                                 </div>
                             ))}
                         </div>
@@ -217,17 +217,17 @@ export default function ChangePasswordPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-18 bg-orange-500 hover:bg-orange-600 text-white font-black rounded-[1.8rem] tracking-[0.25em] transition-all disabled:opacity-20 disabled:cursor-not-allowed shadow-xl shadow-orange-500/20 flex items-center justify-center gap-4 group active:scale-[0.98] uppercase text-sm"
+                        className="w-full h-18 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl transition-all disabled:opacity-20 disabled:cursor-not-allowed shadow-xl shadow-orange-500/20 flex items-center justify-center gap-3 active:scale-[0.98] text-base"
                     >
                         {loading ? (
                             <>
                                 <Loader2 size={24} className="animate-spin" strokeWidth={2.5} />
-                                <span className="animate-pulse">Authorizing...</span>
+                                <span className="animate-pulse">Saving...</span>
                             </>
                         ) : (
                             <>
                                 <Shield size={22} strokeWidth={2.5} />
-                                <span>Securize Access</span>
+                                <span>Change Password</span>
                             </>
                         )}
                     </button>

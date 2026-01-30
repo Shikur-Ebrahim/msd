@@ -70,9 +70,9 @@ function BankDetailContent() {
                     >
                         <ChevronLeft size={22} />
                     </button>
-                    <h1 className="text-lg font-black uppercase tracking-widest text-blue-900 leading-none italic">Funding Protocol</h1>
+                    <h1 className="text-lg font-bold tracking-tight text-blue-900 leading-none">Deposit Details</h1>
                     <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
-                        <Activity size={18} />
+                        <Building2 size={18} />
                     </div>
                 </div>
             </header>
@@ -86,7 +86,7 @@ function BankDetailContent() {
                 >
                     <div className="inline-flex items-center gap-2 px-6 py-2 bg-blue-50 rounded-full border border-blue-100 shadow-sm">
                         <Wallet size={14} className="text-blue-600" />
-                        <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.3em]">Protocol Allocation</span>
+                        <span className="text-[10px] font-bold text-blue-900/60 uppercase tracking-widest">Amount to Deposit</span>
                     </div>
                     <div className="flex items-center justify-center gap-4">
                         <span className="text-7xl font-black text-blue-900 tracking-tighter italic">
@@ -94,7 +94,7 @@ function BankDetailContent() {
                         </span>
                         <div className="flex flex-col items-start">
                             <span className="text-2xl font-black text-blue-900/20 leading-none">ETB</span>
-                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none mt-1">Certified</span>
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mt-1">Confirmed</span>
                         </div>
                     </div>
                 </motion.div>
@@ -104,20 +104,20 @@ function BankDetailContent() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-blue-900 rounded-[3rem] p-10 flex items-center justify-between shadow-2xl shadow-blue-900/20 relative overflow-hidden"
+                    className="bg-blue-600 rounded-[3rem] p-10 flex items-center justify-between shadow-2xl shadow-blue-600/20 relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-16 -mt-16"></div>
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Settlement Net</p>
-                        <p className="text-2xl font-black text-white italic">Etb {Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Total Settlement</p>
+                        <p className="text-2xl font-black text-white italic">ETB {Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                     </div>
-                    <ShieldCheck size={40} className="text-white/10" strokeWidth={1.5} />
+                    <ShieldCheck size={40} className="text-white/20" strokeWidth={1.5} />
                 </motion.div>
 
                 {/* Gateway Selection */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.3em] leading-none">Gateway Authorization</h2>
+                        <h2 className="text-[10px] font-black text-blue-900/40 uppercase tracking-widest leading-none">Select Payment Method</h2>
                         <Info size={14} className="text-blue-900/20" />
                     </div>
 
@@ -146,30 +146,30 @@ function BankDetailContent() {
                                 )}
                             </div>
                             <div className="flex flex-col items-start gap-1">
-                                <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Verified Channel</span>
-                                <span className="text-lg font-black text-blue-900 text-left leading-tight italic uppercase">
-                                    {method?.bankName || "Select Gateway"}
+                                <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest">Recommended Channel</span>
+                                <span className="text-lg font-bold text-blue-900 text-left leading-tight">
+                                    {method?.bankName || "Select Bank"}
                                 </span>
                             </div>
                         </div>
-                        <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100 text-blue-900 transition-all group-hover:bg-blue-900 group-hover:text-white group-hover:border-blue-900 relative z-10">
+                        <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100 text-blue-900 transition-all group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 relative z-10">
                             <ChevronRight size={24} />
                         </div>
                     </motion.button>
                 </div>
 
                 {/* Secure Footer Notification */}
-                <div className="bg-orange-50/50 border border-orange-100 rounded-[2rem] p-6 flex gap-4 items-start animate-pulse relative z-10">
+                <div className="bg-orange-50 border border-orange-100 rounded-[2rem] p-6 flex gap-4 items-start relative z-10">
                     <Info className="text-orange-500 shrink-0 mt-0.5" size={18} />
-                    <p className="text-[10px] font-black text-orange-700 uppercase tracking-widest leading-relaxed">
-                        Ensure the transfer amount remains identical to the protocol request to avoid settlement expiration.
+                    <p className="text-[10px] font-bold text-orange-700 uppercase tracking-widest leading-relaxed">
+                        Please ensure the deposit amount matches your request to avoid any delays in processing.
                     </p>
                 </div>
             </main>
 
             {/* Stealth Logistics */}
             <div className="fixed bottom-10 left-0 right-0 flex justify-center pointer-events-none opacity-10 z-0">
-                <span className="text-[9px] font-black uppercase tracking-[1em] text-blue-900">N-256 FUNDING GATEWAY</span>
+                <span className="text-[9px] font-bold uppercase tracking-[1em] text-blue-900">SECURE PAYMENT GATEWAY</span>
             </div>
         </div>
     );

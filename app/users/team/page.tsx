@@ -188,7 +188,7 @@ export default function TeamPage() {
                     >
                         <ChevronLeft size={22} />
                     </button>
-                    <h1 className="text-lg font-black uppercase tracking-widest text-blue-900 leading-none">Assisted network</h1>
+                    <h1 className="text-lg font-bold text-blue-900 leading-none">My Team</h1>
                     <div className="w-10" />
                 </div>
             </div>
@@ -232,8 +232,8 @@ export default function TeamPage() {
                                 <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-2 border border-blue-100">
                                     <Trophy size={18} className="text-blue-600" />
                                 </div>
-                                <span className="text-[10px] font-black text-blue-900/40 uppercase tracking-widest leading-none mb-1">Impact</span>
-                                <span className="font-black text-blue-900 text-sm tabular-nums leading-none">
+                                <span className="text-[10px] font-bold text-blue-900/40 mb-1">Sales</span>
+                                <span className="font-bold text-blue-900 text-sm tabular-nums leading-none">
                                     {stats.totalTeamRecharge >= 1000000 ? (stats.totalTeamRecharge / 1000000).toFixed(1) + "M" : stats.totalTeamRecharge.toLocaleString()}
                                 </span>
                             </div>
@@ -242,11 +242,11 @@ export default function TeamPage() {
                         {/* List Stats */}
                         <div className="flex-1 w-full space-y-6">
                             <div className="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-50">
-                                <div className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                    Team Revenue <div className="h-[1px] flex-1 bg-blue-100"></div>
+                                <div className="text-[10px] font-bold text-blue-900/40 mb-4 flex items-center gap-2">
+                                    Total Income <div className="h-[1px] flex-1 bg-blue-100"></div>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <p className="text-4xl font-black text-blue-900 tabular-nums leading-none tracking-tighter">
+                                    <p className="text-4xl font-bold text-blue-900 tabular-nums leading-none tracking-tighter">
                                         {stats.totalCommission.toLocaleString()}
                                     </p>
                                     <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
@@ -257,17 +257,17 @@ export default function TeamPage() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-blue-50/50 p-5 rounded-[1.5rem] border border-blue-50">
-                                    <span className="text-[10px] text-blue-900/40 font-black uppercase tracking-widest leading-none block mb-3">Today New</span>
+                                    <span className="text-[10px] text-blue-900/40 font-bold block mb-3">Joined Today</span>
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                        <span className="font-black text-blue-900 text-lg">+{stats.todayJoined}</span>
+                                        <span className="font-bold text-blue-900 text-lg">+{stats.todayJoined}</span>
                                     </div>
                                 </div>
                                 <div className="bg-blue-50/50 p-5 rounded-[1.5rem] border border-blue-50">
-                                    <span className="text-[10px] text-blue-900/40 font-black uppercase tracking-widest leading-none block mb-3">Total Care</span>
+                                    <span className="text-[10px] text-blue-900/40 font-bold block mb-3">Total Members</span>
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                        <span className="font-black text-blue-900 text-lg">{stats.totalMembers}</span>
+                                        <span className="font-bold text-blue-900 text-lg">{stats.totalMembers}</span>
                                     </div>
                                 </div>
                             </div>
@@ -289,8 +289,8 @@ export default function TeamPage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-900 via-blue-900/40 to-transparent"></div>
                     <div className="absolute inset-0 flex items-center justify-between px-8">
                         <div>
-                            <h3 className="text-white font-black text-lg tracking-tight uppercase">Expand Network</h3>
-                            <p className="text-blue-200 text-[10px] font-black uppercase tracking-widest mt-1">Grow your assisted team</p>
+                            <h3 className="text-white font-bold text-lg tracking-tight">Invite Friends</h3>
+                            <p className="text-blue-200 text-[10px] font-bold mt-1">Share your link</p>
                         </div>
                         <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
                             <ChevronLeft size={20} className="rotate-180 text-white" />
@@ -301,8 +301,8 @@ export default function TeamPage() {
                 {/* Level Selectors */}
                 <div className="space-y-4 z-10 relative">
                     <div className="flex items-center justify-between px-2">
-                        <h3 className="text-[10px] font-black text-blue-900/40 uppercase tracking-[0.2em]">Network Tiers</h3>
-                        <div className="text-[10px] font-black text-green-600 uppercase tracking-widest">Rate: {rates[`level${activeTab}` as keyof typeof rates]}%</div>
+                        <h3 className="text-[10px] font-bold text-blue-900/40">Levels</h3>
+                        <div className="text-[10px] font-bold text-green-600">Rate: {rates[`level${activeTab}` as keyof typeof rates]}%</div>
                     </div>
 
                     <div className="bg-blue-50/50 p-1.5 rounded-[1.8rem] border border-blue-100 flex shadow-inner">
@@ -310,12 +310,12 @@ export default function TeamPage() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex-1 py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-500 ${activeTab === tab.id
+                                className={`flex-1 py-4 rounded-[1.2rem] text-[10px] font-bold transition-all duration-500 ${activeTab === tab.id
                                     ? 'bg-blue-900 text-white shadow-lg shadow-blue-900/10 scale-[1.02]'
                                     : 'text-blue-900/30 hover:text-blue-900/60'
                                     }`}
                             >
-                                {tab.label.replace('Level ', 'Tier ')}
+                                {tab.label}
                             </button>
                         ))}
                     </div>
@@ -329,7 +329,7 @@ export default function TeamPage() {
                                 <Search size={24} />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-blue-900/30 uppercase tracking-widest">No assisted members</p>
+                                <p className="text-[11px] font-bold text-blue-900/30">No members found</p>
                             </div>
                         </div>
                     ) : (
@@ -349,16 +349,16 @@ export default function TeamPage() {
 
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-2">
-                                        <h4 className="text-sm font-black text-blue-900 truncate">{formatPhone(member.phoneNumber)}</h4>
-                                        <span className="text-green-600 text-[10px] font-black bg-green-50 px-2 py-0.5 rounded-lg border border-green-100">+{member.rewardEarned.toLocaleString()} ETB</span>
+                                        <h4 className="text-sm font-bold text-blue-900 truncate">{formatPhone(member.phoneNumber)}</h4>
+                                        <span className="text-green-600 text-[10px] font-bold bg-green-50 px-2 py-0.5 rounded-lg border border-green-100">+{member.rewardEarned.toLocaleString()} ETB</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-2">
-                                            <span className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-100/50 text-[9px] font-black text-blue-900/40 uppercase tracking-wider">
-                                                Recharge {member.totalRecharge > 999 ? (member.totalRecharge / 1000).toFixed(1) + 'k' : member.totalRecharge}
+                                            <span className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-100/50 text-[9px] font-bold text-blue-900/40">
+                                                Deposits {member.totalRecharge > 999 ? (member.totalRecharge / 1000).toFixed(1) + 'k' : member.totalRecharge}
                                             </span>
                                         </div>
-                                        <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-widest">
+                                        <span className="text-[9px] font-bold text-blue-900/20">
                                             {new Date(member.joinedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                         </span>
                                     </div>

@@ -47,15 +47,15 @@ export default function ServicePage() {
 
     const contactOptions = [
         {
-            title: "Clinical Liaison",
-            description: "Dedicated 24/7 medical support team",
+            title: "Support Team",
+            description: "24/7 support for any questions",
             image: "/telegram.jpg",
             link: formatTG(links.teamLink),
             color: "blue"
         },
         {
-            title: "MSD Protocol Channel",
-            description: "Stay updated with verified clinical news",
+            title: "Official Channel",
+            description: "Follow us for news and updates",
             image: "/telegram.jpg",
             link: formatTG(links.channelLink),
             color: "green"
@@ -87,8 +87,8 @@ export default function ServicePage() {
                     <ChevronLeft size={22} className="text-blue-900 group-hover:-translate-x-0.5 transition-transform" />
                 </button>
                 <div className="flex flex-col">
-                    <h1 className="text-lg font-black text-blue-900 tracking-tight leading-none uppercase">Clinical Liaison</h1>
-                    <span className="text-[10px] font-black text-blue-900/40 tracking-[0.2em] uppercase mt-1">Medical Support</span>
+                    <h1 className="text-lg font-bold text-blue-900 leading-none">Customer Support</h1>
+                    <span className="text-[10px] text-blue-900/60 mt-1">Help & Support</span>
                 </div>
             </header>
 
@@ -106,9 +106,9 @@ export default function ServicePage() {
                         </div>
                     </motion.div>
                     <div className="space-y-3">
-                        <h2 className="text-3xl font-black text-blue-900 tracking-tight leading-tight uppercase">Medical Help Center</h2>
-                        <p className="text-[10px] font-black text-blue-900/30 uppercase tracking-[0.2em] leading-relaxed max-w-[240px] mx-auto">
-                            Verified support channels for instantaneous clinical assistance.
+                        <h2 className="text-3xl font-bold text-blue-900 tracking-tight leading-tight">Help Center</h2>
+                        <p className="text-sm text-blue-900/40 leading-relaxed max-w-[240px] mx-auto">
+                            Connect with us through our official support channels.
                         </p>
                     </div>
                 </div>
@@ -133,8 +133,8 @@ export default function ServicePage() {
                                     />
                                 </div>
                                 <div className="flex-1 text-left min-w-0">
-                                    <h3 className="text-lg font-black text-blue-900 mb-1 tracking-tight leading-tight">{option.title}</h3>
-                                    <p className="text-[10px] text-blue-900/40 font-black uppercase tracking-widest leading-relaxed">
+                                    <h3 className="text-lg font-bold text-blue-900 mb-1 tracking-tight leading-tight">{option.title}</h3>
+                                    <p className="text-[11px] text-blue-900/40 font-medium leading-relaxed">
                                         {option.description}
                                     </p>
                                 </div>
@@ -146,29 +146,6 @@ export default function ServicePage() {
                     ))}
                 </div>
 
-                {/* Trust Badge */}
-                <div className="pt-4">
-                    <div className="bg-green-50 rounded-[2.5rem] p-8 border border-green-100 flex flex-col sm:flex-row items-center gap-6 shadow-xl shadow-green-900/5">
-                        <div className="w-16 h-16 shrink-0 rounded-2xl bg-white border border-green-100 flex items-center justify-center text-green-600 shadow-sm">
-                            <ShieldCheck size={32} />
-                        </div>
-                        <div className="text-center sm:text-left">
-                            <h4 className="text-[11px] font-black text-green-700 uppercase tracking-[0.2em] mb-1.5">Verified Medical Protocols</h4>
-                            <p className="text-[10px] text-green-600/60 font-black tracking-wide leading-relaxed uppercase">
-                                Encrypted clinical liaison sessions with certified platform delegates.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer Disclaimer */}
-                <div className="flex flex-col items-center gap-4 py-8">
-                    <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-900/20"></div>
-                        <span className="text-[9px] font-black text-blue-900/20 uppercase tracking-[0.3em]">Secure Liaison Portal</span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-900/20"></div>
-                    </div>
-                </div>
             </main>
         </div>
     );
