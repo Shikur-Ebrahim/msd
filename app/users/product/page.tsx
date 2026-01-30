@@ -289,36 +289,6 @@ export default function UserProductsPage() {
                 </div>
             </main>
 
-            {/* Bottom Hospital Navigation */}
-            <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-2xl z-40 border-t border-blue-50 px-6 py-4 pb-8 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.02)] mx-auto max-w-lg">
-                {[
-                    { id: 'home', icon: Home, label: 'Clinic' },
-                    { id: 'product', icon: Package, label: 'Pharmacy' },
-                    { id: 'team', icon: Users, label: 'Assisted' },
-                    { id: 'wallet', icon: Wallet, label: 'Finance' },
-                ].map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => {
-                            if (item.id === 'home') router.push('/users/welcome');
-                            else if (item.id === 'product') router.push('/users/product');
-                            else if (item.id === 'team') router.push('/users/team');
-                            else if (item.id === 'wallet') router.push('/users/profile');
-                        }}
-                        className="flex flex-col items-center gap-1.5 group relative"
-                    >
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 scale-90 group-active:scale-75 ${item.id === 'product' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 rotate-[-5deg]' : 'text-blue-900/40 group-hover:bg-blue-50 group-hover:text-blue-900'}`}>
-                            <item.icon size={22} strokeWidth={item.id === 'product' ? 2.5 : 2} />
-                        </div>
-                        <span className={`text-[9px] font-black uppercase tracking-widest transition-colors duration-500 ${item.id === 'product' ? 'text-blue-900' : 'text-blue-900/30'}`}>
-                            {item.label}
-                        </span>
-                        {item.id === 'product' && (
-                            <motion.div layoutId="nav-dot" className="absolute -bottom-1 w-1 h-1 bg-orange-500 rounded-full" />
-                        )}
-                    </button>
-                ))}
-            </nav>
         </div>
     );
 }

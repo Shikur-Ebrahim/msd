@@ -12,7 +12,9 @@ import {
     onSnapshot,
     query,
     orderBy,
-    limit
+    limit,
+    where,
+    updateDoc
 } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import {
@@ -41,7 +43,8 @@ import {
     Activity,
     CreditCard,
     Building2,
-    Headphones
+    Headphones,
+    PartyPopper
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -50,6 +53,8 @@ export default function ProfilePage() {
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [hasRuleUpdates, setHasRuleUpdates] = useState(false);
+    const [totalWeekendBalance, setTotalWeekendBalance] = useState(0);
+    const [globalWeekendSettings, setGlobalWeekendSettings] = useState<any>(null);
 
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
@@ -73,6 +78,58 @@ export default function ProfilePage() {
 
         return () => unsubscribeAuth();
     }, [router]);
+
+    // Fetch Weekend Orders for total weekend balance
+    useEffect(() => {
+        if (!user) return;
+
+        const q = query(
+            collection(db, "WeekendUserOrders"),
+            where("userId", "==", user.uid)
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const orders = snapshot.docs.map(doc => doc.data());
+            const total = orders.reduce((sum, order: any) => sum + (order.weekendBalance || 0), 0);
+            setTotalWeekendBalance(total);
+        }, (error) => {
+            console.error("Error fetching weekend orders:", error);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
+
+    // Fetch Global Weekend Settings and Lock for User
+    useEffect(() => {
+        if (!user || !userData) return;
+
+        // Skip if already locked for this user
+        if (userData.fixedWeekendBalance !== undefined) return;
+
+        const fetchAndLock = async () => {
+            try {
+                const globalRef = doc(db, "GlobalSettings", "weekend");
+                const globalSnap = await getDoc(globalRef);
+
+                if (globalSnap.exists()) {
+                    const globalData = globalSnap.data();
+                    const defaultBalance = Number(globalData.defaultBalance || 0);
+
+                    if (defaultBalance > 0) {
+                        // Lock it for this user one-time
+                        const userRef = doc(db, "users", user.uid);
+                        await updateDoc(userRef, {
+                            fixedWeekendBalance: defaultBalance
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error in global balance locking:", error);
+            }
+        };
+
+        fetchAndLock();
+    }, [user, userData]);
 
     useEffect(() => {
         if (!userData) return;
@@ -108,12 +165,12 @@ export default function ProfilePage() {
     };
 
     const stats = [
-        { label: "Total Deposits", value: userData?.totalRecharge || "0.00", icon: CreditCard, color: "blue", category: "wallet" },
-        { label: "Assisted Revenue", value: userData?.teamIncome || "0.00", icon: Users, color: "green", category: "team" },
-        { label: "Medication Yield", value: userData?.totalIncome || "0.00", icon: TrendingUp, color: "blue", category: "earnings" },
-        { label: "Total Refunds", value: userData?.totalWithdrawal || "0.00", icon: ArrowUpRight, color: "orange", category: "wallet" },
+        { label: "Total Deposits", value: Math.floor(userData?.totalRecharge || 0).toLocaleString(), icon: CreditCard, color: "blue", category: "wallet" },
+        { label: "Assisted Revenue", value: Math.floor(userData?.teamIncome || 0).toLocaleString(), icon: Users, color: "green", category: "team" },
+        { label: "Medication Yield", value: Math.floor(userData?.totalIncome || 0).toLocaleString(), icon: TrendingUp, color: "blue", category: "earnings" },
+        { label: "Total Refunds", value: Math.floor(userData?.totalWithdrawal || 0).toLocaleString(), icon: ArrowUpRight, color: "orange", category: "wallet" },
         { label: "Patient Network", value: userData?.teamSize || "0", icon: Users, color: "blue", category: "team" },
-        { label: "Active Yield", value: userData?.dailyIncome || "0.00", icon: Zap, color: "green", category: "earnings" },
+        { label: "Active Yield", value: Math.floor(userData?.dailyIncome || 0).toLocaleString(), icon: Zap, color: "green", category: "earnings" },
     ];
 
     return (
@@ -188,9 +245,28 @@ export default function ProfilePage() {
                             </div>
                             <div className="flex flex-col items-end">
                                 <span className="text-2xl font-black text-green-600 tracking-tight">
-                                    {userData?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
+                                    {Math.floor(userData?.balance || 0).toLocaleString()}
                                 </span>
                                 <span className="text-[10px] font-black text-green-600/60 uppercase tracking-widest">ETB</span>
+                            </div>
+                        </div>
+
+                        {/* Weekend Balance Section */}
+                        <div className="flex items-center justify-between mb-10 pb-10 border-b border-orange-50">
+                            <div className="flex items-center gap-5">
+                                <div className="w-14 h-14 rounded-3xl bg-orange-50 flex items-center justify-center text-orange-600 border border-orange-100">
+                                    <PartyPopper size={28} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-orange-900/40 uppercase tracking-[0.2em] mb-1">Weekend Finance</span>
+                                    <span className="text-sm font-black text-orange-900">Weekend Balance</span>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-end">
+                                <span className="text-2xl font-black text-orange-600 tracking-tight">
+                                    {Math.floor(totalWeekendBalance + (userData?.fixedWeekendBalance || 0)).toLocaleString()}
+                                </span>
+                                <span className="text-[10px] font-black text-orange-600/60 uppercase tracking-widest">ETB</span>
                             </div>
                         </div>
 
@@ -211,6 +287,7 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 </div>
+
 
                 {/* Advanced Core Services - Medical Interaction */}
                 <div className="grid grid-cols-4 gap-4 mb-12">

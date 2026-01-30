@@ -42,37 +42,39 @@ import {
 import AdminSidebar from "@/components/AdminSidebar";
 import { toast } from "sonner";
 
-interface BankDetails {
-    accountNumber: string;
-    holderName: string;
-    bankName: string;
-    bankLogoUrl?: string;
-}
-
 interface Withdrawal {
     id: string;
     userId: string;
+    userPhone: string;
     amount: number | string;
     actualReceipt: number | string;
     fee: number | string;
     status: string;
-    userPhone: string;
-    bankDetails: BankDetails;
-    createdAt: any; // Using any for Timestamp/Date flexibility as seen in code
+    createdAt: any;
     verifiedAt?: any;
+    bankDetails?: {
+        bankName?: string;
+        bankLogoUrl?: string;
+        accountNumber?: string;
+        holderName?: string;
+    };
 }
 
-interface WithdrawalGroup {
-    timestamp: number;
-    items: Withdrawal[];
+interface WithdrawalCardProps {
+    item: Withdrawal;
+    isPending: boolean;
+    verifying: string | null;
+    setConfirmAction: (action: { type: 'verify', data: Withdrawal } | null) => void;
+    copyToClipboard: (text: string, id: string, message?: string) => void;
+    copiedId: string | null;
 }
 
-export default function WithdrawalWalletPage() {
+export default function WeekendWithdrawalWalletPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [verifying, setVerifying] = useState<string | null>(null);
-    const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
+    const [withdrawals, setWithdrawals] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [confirmAction, setConfirmAction] = useState<{ type: 'verify', data: any } | null>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -93,12 +95,12 @@ export default function WithdrawalWalletPage() {
         });
 
         const q = query(
-            collection(db, "Withdrawals"),
+            collection(db, "WeekendWithdrawals"),
             orderBy("createdAt", "desc")
         );
 
         const unsubscribeWithdrawals = onSnapshot(q, (snapshot) => {
-            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Withdrawal));
+            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setWithdrawals(data);
         });
 
@@ -108,7 +110,7 @@ export default function WithdrawalWalletPage() {
         };
     }, [router]);
 
-    const handleVerify = async (withdrawal: Withdrawal) => {
+    const handleVerify = async (withdrawal: any) => {
         if (verifying) return;
         setVerifying(withdrawal.id);
         setConfirmAction(null);
@@ -116,7 +118,7 @@ export default function WithdrawalWalletPage() {
         try {
             await runTransaction(db, async (transaction) => {
                 const userDocRef = doc(db, "users", withdrawal.userId);
-                const withdrawalRef = doc(db, "Withdrawals", withdrawal.id);
+                const withdrawalRef = doc(db, "WeekendWithdrawals", withdrawal.id);
 
                 const userDocSnap = await transaction.get(userDocRef);
                 if (!userDocSnap.exists()) throw "User does not exist!";
@@ -136,7 +138,7 @@ export default function WithdrawalWalletPage() {
                 const notifRef = doc(collection(db, "UserNotifications"));
                 transaction.set(notifRef, {
                     userId: withdrawal.userId,
-                    type: "withdrawal_verified",
+                    type: "weekend_withdrawal_verified",
                     amount: amount,
                     status: "verified",
                     read: false,
@@ -144,7 +146,7 @@ export default function WithdrawalWalletPage() {
                 });
             });
 
-            toast.success(`Withdrawal of ETB ${withdrawal.amount} verified!`);
+            toast.success(`Weekend Withdrawal of ETB ${withdrawal.amount} verified!`);
         } catch (error) {
             console.error("Verification error:", error);
             toast.error(typeof error === 'string' ? error : "Failed to verify");
@@ -260,25 +262,23 @@ export default function WithdrawalWalletPage() {
         );
 
         // Grouping logic
-        const groupsMap = new Map<string, WithdrawalGroup>();
+        const groupsMap = new Map();
 
         filtered.forEach(w => {
             const date = w.createdAt?.toDate ? w.createdAt.toDate() : new Date(w.createdAt);
             const dateKey = date.toDateString();
 
-            let group = groupsMap.get(dateKey);
-            if (!group) {
-                group = {
-                    timestamp: new Date(date).setHours(0, 0, 0, 0),
+            if (!groupsMap.has(dateKey)) {
+                groupsMap.set(dateKey, {
+                    timestamp: new Date(date).setHours(0, 0, 0, 0), // Use start of day for stable sorting
                     items: []
-                };
-                groupsMap.set(dateKey, group);
+                });
             }
-            group.items.push(w);
+            groupsMap.get(dateKey).items.push(w);
         });
 
         const sortedGroups = Array.from(groupsMap.values())
-            .sort((a: WithdrawalGroup, b: WithdrawalGroup) => b.timestamp - a.timestamp) // Newest Day First
+            .sort((a: { timestamp: number }, b: { timestamp: number }) => b.timestamp - a.timestamp) // Newest Day First
             .map(group => {
                 const sortedItems = group.items.sort((a: Withdrawal, b: Withdrawal) => {
                     const timeA = a.createdAt?.seconds ? a.createdAt.seconds : new Date(a.createdAt).getTime() / 1000;
@@ -319,8 +319,8 @@ export default function WithdrawalWalletPage() {
             <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
                 <div className="flex flex-col items-center gap-6">
                     <div className="w-20 h-20 bg-white rounded-[2.5rem] shadow-2xl flex items-center justify-center relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-indigo-500/10 animate-pulse"></div>
-                        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin relative z-10" />
+                        <div className="absolute inset-0 bg-orange-500/10 animate-pulse"></div>
+                        <Loader2 className="w-10 h-10 text-orange-600 animate-spin relative z-10" />
                     </div>
                 </div>
             </div>
@@ -328,19 +328,19 @@ export default function WithdrawalWalletPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 flex">
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-orange-100 flex">
             {/* Confirmation Drawer */}
             {confirmAction && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 transition-all">
                     <div className="w-full max-w-sm bg-white rounded-t-[3rem] sm:rounded-[3rem] p-8 shadow-2xl space-y-8 animate-in slide-in-from-bottom duration-300">
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 sm:hidden"></div>
                         <div className="flex flex-col items-center text-center space-y-4">
-                            <div className="w-24 h-24 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center ring-[12px] ring-indigo-50/50">
+                            <div className="w-24 h-24 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center ring-[12px] ring-orange-50/50">
                                 <ShieldCheck size={48} />
                             </div>
                             <h3 className="text-2xl font-black text-slate-900 leading-tight">Authorize Payment?</h3>
                             <p className="text-sm text-slate-500 font-medium px-4">
-                                Confirming <span className="text-indigo-600 font-black">ETB {Number(confirmAction.data.amount).toLocaleString()}</span> payout for {confirmAction.data.userPhone}.
+                                Confirming <span className="text-orange-600 font-black">ETB {Number(confirmAction.data.amount).toLocaleString()}</span> weekend payout for {confirmAction.data.userPhone}.
                             </p>
                         </div>
 
@@ -376,7 +376,7 @@ export default function WithdrawalWalletPage() {
                         </button>
                         <div className="flex flex-col">
                             <div className="flex items-center gap-3 mb-1">
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tighter leading-none">Vault Control</h2>
+                                <h2 className="text-2xl font-black text-slate-900 tracking-tighter leading-none">Weekend Vault</h2>
                                 {stats.pendingCount > 0 && (
                                     <div className="flex items-center justify-center min-w-[2.2rem] h-9 px-3 bg-red-500 text-white rounded-[1rem] text-xs font-black shadow-lg shadow-red-500/30 animate-bounce">
                                         {stats.pendingCount}
@@ -384,8 +384,8 @@ export default function WithdrawalWalletPage() {
                                 )}
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Live Settlement Engine</span>
+                                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Weekend Settlement Engine</span>
                             </div>
                         </div>
                     </div>
@@ -393,7 +393,7 @@ export default function WithdrawalWalletPage() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => window.location.reload()}
-                            className="w-14 h-14 flex items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 active:rotate-180 transition-all duration-700 shadow-sm"
+                            className="w-14 h-14 flex items-center justify-center rounded-2xl bg-orange-50 text-orange-600 active:rotate-180 transition-all duration-700 shadow-sm"
                         >
                             <RefreshCcw size={22} strokeWidth={2.5} />
                         </button>
@@ -401,10 +401,24 @@ export default function WithdrawalWalletPage() {
                 </header>
 
                 <div className="p-4 sm:p-8 space-y-10 max-w-lg mx-auto w-full">
-                    {/* Financial Guard Section - Always Visible */}
-                    <div className="bg-white rounded-[2.5rem] p-6 border-2 border-indigo-100 shadow-2xl shadow-indigo-500/10 space-y-6">
+                    {/* Search Section */}
+                    <div className="relative group">
+                        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-orange-600 transition-colors">
+                            <Search size={20} />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="SEARCH BY PHONE OR ACCOUNT..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full h-16 pl-14 pr-6 bg-white border-2 border-slate-100 rounded-3xl focus:outline-none focus:border-orange-500 text-sm font-bold tracking-widest shadow-xl shadow-slate-200/40 transition-all uppercase"
+                        />
+                    </div>
+
+                    {/* Financial Guard Section */}
+                    <div className="bg-white rounded-[2.5rem] p-6 border-2 border-orange-100 shadow-2xl shadow-orange-500/10 space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                            <div className="w-10 h-10 rounded-xl bg-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-600/20">
                                 <ShieldCheck size={20} />
                             </div>
                             <h3 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Legality Verification</h3>
@@ -416,12 +430,12 @@ export default function WithdrawalWalletPage() {
                                 placeholder="USER PHONE..."
                                 value={checkSearchTerm}
                                 onChange={(e) => setCheckSearchTerm(e.target.value)}
-                                className="flex-1 h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 text-sm font-bold tracking-widest"
+                                className="flex-1 h-14 px-6 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-orange-500 text-sm font-bold tracking-widest"
                             />
                             <button
                                 onClick={handleFinancialCheck}
                                 disabled={checkLoading}
-                                className="px-6 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+                                className="px-6 bg-orange-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
                             >
                                 {checkLoading ? <Loader2 className="animate-spin" size={20} /> : 'Check'}
                             </button>
@@ -448,7 +462,7 @@ export default function WithdrawalWalletPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-indigo-50/50 p-4 rounded-2xl space-y-2">
+                                <div className="bg-orange-50/50 p-4 rounded-2xl space-y-2">
                                     <div className="flex justify-between text-[10px] font-bold text-slate-500">
                                         <span>Product Earnings</span>
                                         <span className="text-slate-900">{checkResult.productIncome.toLocaleString()} ETB</span>
@@ -457,43 +471,15 @@ export default function WithdrawalWalletPage() {
                                         <span>Team Rewards (90%)</span>
                                         <span className="text-slate-900">{checkResult.teamIncome90.toLocaleString()} ETB</span>
                                     </div>
-                                    <div className="pt-2 border-t border-indigo-100 flex justify-between text-[10px] font-black text-rose-500 uppercase">
+                                    <div className="pt-2 border-t border-orange-100 flex justify-between text-[10px] font-black text-rose-500 uppercase">
                                         <span>Total Claimed + Balance</span>
                                         <span>{checkResult.liability.toLocaleString()} ETB</span>
                                     </div>
                                 </div>
-
-                                {/* Active Products List */}
-                                {checkResult.orders?.length > 0 && (
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Active Portfolio</p>
-                                        <div className="space-y-2">
-                                            {checkResult.orders.map((order: any, idx: number) => {
-                                                const purchaseDate = order.purchaseDate?.toDate?.() || new Date(order.purchaseDate);
-                                                const daysPassed = Math.floor((new Date().getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
-                                                return (
-                                                    <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex justify-between items-center group hover:border-indigo-200 transition-all">
-                                                        <div className="space-y-1">
-                                                            <p className="text-xs font-black text-slate-900">{order.productName || 'Product'}</p>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[9px] font-bold text-slate-400">Day {daysPassed}/{order.contractPeriod}</span>
-                                                                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                                                <span className="text-[9px] font-black text-indigo-600">{order.dailyIncome} ETB/Day</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-[9px] font-black text-slate-300 uppercase leading-none mb-1">Total Yield</p>
-                                                            <p className="text-sm font-black text-emerald-600 tracking-tighter">{(order.dailyIncome * Math.max(0, daysPassed)).toLocaleString()} ETB</p>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         )}
                     </div>
+
                     {/* Visual Stats Block */}
                     <div className="flex gap-4">
                         <div className="flex-1 bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between h-36">
@@ -508,7 +494,7 @@ export default function WithdrawalWalletPage() {
                             </div>
                         </div>
                         <div className="flex-1 bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl shadow-slate-900/10 flex flex-col justify-between h-36 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-700"></div>
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-700"></div>
                             <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white mb-2 relative z-10">
                                 <Clock size={24} className="animate-pulse" />
                             </div>
@@ -521,13 +507,11 @@ export default function WithdrawalWalletPage() {
                         </div>
                     </div>
 
-
-
                     <div className="space-y-12 pb-24">
                         {groupedWithdrawals.map(group => (
                             <div key={group.label} className="space-y-6">
                                 <div className="flex items-center gap-4 px-2">
-                                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${group.label === "Today" ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}`}>
+                                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${group.label === "Today" ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-400'}`}>
                                         <Calendar size={18} strokeWidth={3} />
                                     </div>
                                     <h3 className={`text-xs font-black uppercase tracking-[0.3em] ${group.label === "Today" ? 'text-slate-900' : 'text-slate-400'}`}>
@@ -557,7 +541,7 @@ export default function WithdrawalWalletPage() {
                                     <Banknote size={48} strokeWidth={1} />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Vault Empty</p>
+                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Weekend Vault Empty</p>
                                     <p className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">No transactions matched your query</p>
                                 </div>
                             </div>
@@ -570,14 +554,7 @@ export default function WithdrawalWalletPage() {
 }
 
 // Sub-component for clarity and re-renders
-function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToClipboard, copiedId }: {
-    item: Withdrawal;
-    isPending: boolean;
-    verifying: string | null;
-    setConfirmAction: (action: { type: 'verify', data: Withdrawal } | null) => void;
-    copyToClipboard: (text: string, id: string, message?: string) => void;
-    copiedId: string | null;
-}) {
+function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToClipboard, copiedId }: WithdrawalCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedAccountNumber, setEditedAccountNumber] = useState(item.bankDetails?.accountNumber || "");
     const [editedHolderName, setEditedHolderName] = useState(item.bankDetails?.holderName || "");
@@ -591,16 +568,20 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
 
         setIsUpdating(true);
         try {
+            // Pre-fetch Bank document ID for the user
             const bankQ = query(collection(db, "Bank"), where("uid", "==", item.userId));
             const bankSnap = await getDocs(bankQ);
 
             await runTransaction(db, async (transaction) => {
-                const withdrawalRef = doc(db, "Withdrawals", item.id);
+                const withdrawalRef = doc(db, "WeekendWithdrawals", item.id);
+
+                // 1. Update the withdrawal record
                 transaction.update(withdrawalRef, {
                     "bankDetails.accountNumber": editedAccountNumber,
                     "bankDetails.holderName": editedHolderName
                 });
 
+                // 2. Sync with User's primary Bank info if it exists
                 if (!bankSnap.empty) {
                     const bankDocRef = doc(db, "Bank", bankSnap.docs[0].id);
                     transaction.update(bankDocRef, {
@@ -610,7 +591,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                 }
             });
 
-            toast.success("Details updated & synced!");
+            toast.success("Details updated & synced with Bank collection!");
             setIsEditing(false);
         } catch (error) {
             console.error("Update error:", error);
@@ -655,7 +636,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                 ) : (
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 flex items-center justify-center shadow-sm hover:text-indigo-600 active:scale-90 transition-all"
+                        className="w-10 h-10 rounded-xl bg-white text-slate-400 border border-slate-100 flex items-center justify-center shadow-sm hover:text-orange-600 active:scale-90 transition-all"
                     >
                         <Edit3 size={18} />
                     </button>
@@ -670,7 +651,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                         <div className="flex items-center gap-2">
                             <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border shadow-sm
                                 ${isPending ? 'bg-amber-100 text-amber-700 border-amber-300/50' : 'bg-emerald-50 text-emerald-700 border-emerald-200/50'}`}>
-                                {isPending ? '🔴 Action Required' : '🟢 Verified'}
+                                {isPending ? '🔴 Weekend Alert' : '🟢 Settled'}
                             </span>
                         </div>
                         <div className="flex items-baseline gap-1 mt-3">
@@ -697,7 +678,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                     >
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                                <Phone size={12} className="text-indigo-400" />
+                                <Phone size={12} className="text-orange-400" />
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mobile</span>
                             </div>
                             <div className={`transition-all ${copiedId === item.id + '_phone' ? 'text-emerald-500' : 'text-slate-300 opacity-0 group-hover/phone:opacity-100'}`}>
@@ -708,7 +689,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                     </button>
                     <div className="bg-white/60 backdrop-blur-xl rounded-[1.8rem] p-5 border border-white/80 shadow-sm transition-all hover:bg-white min-h-[5.5rem] flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-2">
-                            <User size={12} className="text-indigo-400" />
+                            <User size={12} className="text-orange-400" />
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Client</span>
                         </div>
                         {isEditing ? (
@@ -716,7 +697,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                                 type="text"
                                 value={editedHolderName}
                                 onChange={(e) => setEditedHolderName(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-black uppercase text-slate-900 focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-black uppercase text-slate-900 focus:outline-none focus:border-orange-500"
                                 placeholder="Holder Name"
                             />
                         ) : (
@@ -728,7 +709,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                 <div className="space-y-3">
                     <div className="flex justify-between items-center px-1">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Vault</span>
-                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter bg-indigo-50 px-3 py-1 rounded-lg">{item.bankDetails?.bankName}</span>
+                        <span className="text-[10px] font-black text-orange-600 uppercase tracking-tighter bg-orange-50 px-3 py-1 rounded-lg">{item.bankDetails?.bankName}</span>
                     </div>
                     {isEditing ? (
                         <div className="w-full bg-slate-900 rounded-[1.8rem] p-6 shadow-2xl">
@@ -736,7 +717,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                                 type="text"
                                 value={editedAccountNumber}
                                 onChange={(e) => setEditedAccountNumber(e.target.value)}
-                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-lg font-mono font-black text-indigo-400 tracking-[0.25em] focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-lg font-mono font-black text-orange-400 tracking-[0.25em] focus:outline-none focus:border-orange-500"
                                 placeholder="Account Number"
                             />
                         </div>
@@ -745,7 +726,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                             onClick={() => copyToClipboard(item.bankDetails?.accountNumber, item.id)}
                             className="w-full bg-slate-900 rounded-[1.8rem] p-6 flex items-center justify-between group overflow-hidden relative shadow-2xl active:scale-95 transition-all"
                         >
-                            <span className="text-lg font-mono font-black text-indigo-400 tracking-[0.25em] drop-shadow-sm">
+                            <span className="text-lg font-mono font-black text-orange-400 tracking-[0.25em] drop-shadow-sm">
                                 {item.bankDetails?.accountNumber}
                             </span>
                             <div className={`p-3 rounded-2xl transition-all ${copiedId === item.id ? 'bg-emerald-500 text-white' : 'bg-white/10 text-white/40'}`}>
@@ -793,12 +774,12 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                     <button
                         onClick={() => setConfirmAction({ type: 'verify', data: item })}
                         disabled={verifying === item.id}
-                        className="w-full h-18 rounded-[2rem] bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-[0.3em] flex items-center justify-center gap-4 shadow-2xl shadow-indigo-600/30 transition-all group active:scale-95 py-5"
+                        className="w-full h-18 rounded-[2rem] bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase tracking-[0.3em] flex items-center justify-center gap-4 shadow-2xl shadow-orange-600/30 transition-all group active:scale-95 py-5"
                     >
                         {verifying === item.id ? (
                             <Loader2 className="animate-spin" size={24} />
                         ) : (
-                            <>Authorize & Release <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} /></>
+                            <>Authorize Weekend Payout <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} /></>
                         )}
                     </button>
                 ) : (

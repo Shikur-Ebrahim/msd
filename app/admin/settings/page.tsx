@@ -30,7 +30,8 @@ import {
     CheckCircle2,
     XCircle,
     Copy,
-    ArrowRight
+    ArrowRight,
+    Gift
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -188,6 +189,14 @@ export default function AdminSettings() {
             icon: Calendar,
             color: "bg-indigo-50 text-indigo-600",
             path: "/admin/settings/income"
+        },
+        {
+            id: "weekend",
+            title: "Weekend Settings",
+            desc: "Default weekend balance config",
+            icon: Gift,
+            color: "bg-orange-50 text-orange-600",
+            path: "/admin/settings/weekend"
         },
         {
             id: "security",

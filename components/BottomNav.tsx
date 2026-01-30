@@ -1,10 +1,11 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Home, Ship, Users, Shield } from "lucide-react";
+import { Home, Ship, Users, Shield, PartyPopper, History } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, Suspense } from "react";
 import { syncDailyIncome } from "@/lib/sync";
+import { syncWeekendDailyIncome } from "@/lib/weekendSync";
 import { auth } from "@/lib/firebase";
 
 function BottomNavContent() {
@@ -25,6 +26,7 @@ function BottomNavContent() {
                 setUserId(user.uid);
                 // Trigger sync when we have a user
                 syncDailyIncome(user.uid);
+                syncWeekendDailyIncome(user.uid);
             }
         });
         return () => unsubscribe();
@@ -35,8 +37,10 @@ function BottomNavContent() {
         const tab = searchParams.get("tab");
         if (pathname === "/users/welcome") {
             setActiveTab(tab || "home");
-        } else if (pathname === "/users/product") {
-            setActiveTab("product");
+        } else if (pathname === "/users/weekend") {
+            setActiveTab("weekend");
+        } else if (pathname === "/users/weekend-record") {
+            setActiveTab("w-page");
         } else if (pathname === "/users/profile") {
             setActiveTab("me");
         } else if (pathname.includes("/users/team")) {
@@ -44,13 +48,14 @@ function BottomNavContent() {
         }
     }, [pathname, searchParams, mounted]);
 
-    const hideNav = pathname === "/users/chat" || pathname === "/users/tasks" || pathname.startsWith("/users/withdraw") || pathname === "/users/change-withdrawal-password" || pathname.includes("-record") || pathname === "/users/funding-details" || (pathname.startsWith("/users/product/") && pathname !== "/users/product");
+    const hideNav = pathname === "/users/chat" || pathname === "/users/tasks" || pathname.startsWith("/users/withdraw") || pathname === "/users/change-withdrawal-password" || (pathname.includes("-record") && pathname !== "/users/weekend-record") || pathname === "/users/funding-details" || (pathname.startsWith("/users/product/") && pathname !== "/users/product") || (pathname.startsWith("/users/weekend/") && pathname !== "/users/weekend");
 
     if (!mounted || hideNav) return null;
 
     const navItems = [
         { id: "home", icon: Home, label: "Clinic", path: "/users/welcome?tab=home" },
-        { id: "product", icon: Ship, label: "Pharmacy", path: "/users/product" },
+        { id: "weekend", icon: PartyPopper, label: "Weekend", path: "/users/weekend" },
+        { id: "w-page", icon: History, label: "W.Page", path: "/users/weekend-record" },
         { id: "team", icon: Users, label: "Assisted", path: "/users/team" },
         { id: "me", icon: Shield, label: "Finance", path: "/users/profile" },
     ];

@@ -28,7 +28,8 @@ import {
     Crown,
     PartyPopper,
     BarChart3,
-    TrendingUp
+    TrendingUp,
+    Gift
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -41,6 +42,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     const pathname = usePathname();
     const [pendingRechargeCount, setPendingRechargeCount] = useState(0);
     const [pendingWithdrawalCount, setPendingWithdrawalCount] = useState(0);
+    const [pendingWeekendWithdrawalCount, setPendingWeekendWithdrawalCount] = useState(0);
     const [vipUpgradeCount, setVipUpgradeCount] = useState(0);
 
     useEffect(() => {
@@ -71,10 +73,20 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
             setVipUpgradeCount(snapshot.size);
         });
 
+        // Weekend Withdrawal Listener
+        const qWeekendWithdrawal = query(
+            collection(db, "WeekendWithdrawals"),
+            where("status", "==", "pending")
+        );
+        const unsubscribeWeekendWithdrawal = onSnapshot(qWeekendWithdrawal, (snapshot) => {
+            setPendingWeekendWithdrawalCount(snapshot.size);
+        });
+
         return () => {
             unsubscribeRecharge();
             unsubscribeWithdrawal();
             unsubscribeVip();
+            unsubscribeWeekendWithdrawal();
         };
     }, []);
 
@@ -82,6 +94,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { id: "recharge", label: "Recharge Wallet", icon: ShieldCheck, path: "/admin/recharge-verification" },
         { id: "recharge-tracking", label: "Recharge Users", icon: TrendingUp, path: "/admin/recharge-tracking" },
         { id: "withdrawal-wallet", label: "Withdrawal Wallet", icon: Banknote, path: "/admin/withdrawal-wallet" },
+        { id: "weekend-withdrawal", label: "Weekend Withdrawal", icon: Banknote, path: "/admin/weekend-withdrawal" },
         { id: "financials", label: "Financial Stats", icon: BarChart3, path: "/admin/financials" },
         { id: "vip-upgrade", label: "VIP Upgrade", icon: ShieldCheck, path: "/admin/vip-upgrade" },
         { id: "home", label: "Dashboard", icon: Home, path: "/admin/dashboard" },
@@ -93,6 +106,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { id: "unlink-account", label: "Unlink Account", icon: UserX, path: "/admin/unlink-account" },
         { id: "notifications", label: "Withdrawal Alerts", icon: Bell, path: "/admin/notifications" },
         { id: "products", label: "Products", icon: Package, path: "/admin/product" },
+        { id: "weekend-product", label: "Weekend", icon: PartyPopper, path: "/admin/weekend-product" },
         { id: "referral", label: "Referral Rule", icon: Percent, path: "/admin/referral-settings" },
         { id: "vip-rules", label: "VIP Rules", icon: Crown, path: "/admin/vip-rules" },
         { id: "vip-notifications", label: "VIP Celebration", icon: PartyPopper, path: "/admin/vip-notifications" },
@@ -188,6 +202,11 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                                     {item.id === "withdrawal-wallet" && pendingWithdrawalCount > 0 && (
                                         <span className="ml-auto bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce shadow-lg shadow-red-500/40">
                                             {pendingWithdrawalCount}
+                                        </span>
+                                    )}
+                                    {item.id === "weekend-withdrawal" && pendingWeekendWithdrawalCount > 0 && (
+                                        <span className="ml-auto bg-orange-500 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce shadow-lg shadow-orange-500/40">
+                                            {pendingWeekendWithdrawalCount}
                                         </span>
                                     )}
                                     {item.id === "vip-upgrade" && vipUpgradeCount > 0 && (
