@@ -298,7 +298,7 @@ export default function AuthForm() {
                 className="w-full max-w-[480px] min-h-screen md:min-h-0 flex flex-col justify-center relative z-10 px-4 md:px-0"
             >
                 {/* Main Content Area */}
-                <div className="bg-white/80 backdrop-blur-3xl md:rounded-[3.5rem] md:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.1)] border border-white/50 overflow-hidden flex flex-col min-h-[90vh] md:min-h-0 shadow-xl">
+                <div className="flex flex-col min-h-[90vh] md:min-h-0">
 
                     {/* Logo Section */}
                     <div className="pt-20 pb-10 px-8 text-center">
@@ -316,11 +316,11 @@ export default function AuthForm() {
                         </div>
 
                         <div className="space-y-1">
-                            <h1 className="text-3xl font-black text-blue-900 tracking-tight mb-2">
-                                {activeTab === "register" ? "Create Account" : "Welcome Back"}
+                            <h1 className="text-3xl font-bold text-blue-900 tracking-tight mb-2">
+                                {activeTab === "register" ? "Register" : "Login"}
                             </h1>
                             <p className="text-xs text-blue-600/60 font-medium">
-                                {activeTab === "register" ? "Join MSD Medicine" : "Sign in to your account"}
+                                {activeTab === "register" ? "Create your account" : "Sign in to continue"}
                             </p>
                         </div>
 
@@ -330,12 +330,12 @@ export default function AuthForm() {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`flex-1 py-4 rounded-2xl text-[10px] font-black tracking-widest uppercase transition-all duration-500 ${activeTab === tab
+                                    className={`flex-1 py-4 rounded-2xl text-[12px] font-bold transition-all duration-500 capitalize ${activeTab === tab
                                         ? "bg-white text-blue-900 shadow-md scale-[1.02]"
                                         : "text-blue-900/40 hover:text-blue-900/60"
                                         }`}
                                 >
-                                    {tab.replace("-", " ")}
+                                    {tab}
                                 </button>
                             ))}
                         </div>
@@ -429,7 +429,7 @@ export default function AuthForm() {
                                                 required
                                                 value={formData.phoneNumber}
                                                 onChange={handleInputChange}
-                                                className="w-full px-5 py-5 bg-transparent outline-none text-blue-900 font-bold placeholder:text-blue-900/20"
+                                                className="w-full px-5 py-5 bg-transparent outline-none text-blue-900 font-bold placeholder:text-blue-900/40"
                                                 placeholder={activeTab === "login" ? "Email or Phone" : "Phone Number"}
                                             />
                                         </div>
@@ -440,7 +440,7 @@ export default function AuthForm() {
                                                     type="text"
                                                     name="fullName"
                                                     required
-                                                    className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/20 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all"
+                                                    className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/40 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all"
                                                     placeholder="Full Name"
                                                     value={formData.fullName}
                                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
@@ -455,7 +455,7 @@ export default function AuthForm() {
                                                 required
                                                 value={formData.password}
                                                 onChange={handleInputChange}
-                                                className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/20 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all pr-14"
+                                                className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/40 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all pr-14"
                                                 placeholder="Password"
                                             />
                                             <button
@@ -479,7 +479,7 @@ export default function AuthForm() {
                                                     required={activeTab === "register"}
                                                     value={formData.confirmPassword}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/20 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all"
+                                                    className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/40 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all"
                                                     placeholder="Confirm Password"
                                                 />
                                             </motion.div>
@@ -492,16 +492,16 @@ export default function AuthForm() {
                                         whileTap={{ scale: 0.98 }}
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full h-16 bg-orange-500 text-white rounded-[1.5rem] font-black text-[12px] tracking-[0.25em] uppercase transition-all shadow-lg shadow-orange-500/20 hover:bg-orange-600 disabled:opacity-50 flex items-center justify-center gap-3 active:scale-[0.98]"
+                                        className="w-full h-16 bg-orange-500 text-white rounded-[1.5rem] font-bold text-sm transition-all shadow-lg shadow-orange-500/20 hover:bg-orange-600 disabled:opacity-50 flex items-center justify-center gap-3 active:scale-[0.98]"
                                     >
                                         {loading ? (
                                             <>
                                                 <Loader2 className="animate-spin" size={20} strokeWidth={3} />
-                                                <span>Verifying...</span>
+                                                <span>Loading...</span>
                                             </>
                                         ) : (
                                             <>
-                                                <span>{activeTab === "register" ? "Confirm Registration" : "Enter Securely"}</span>
+                                                <span>{activeTab === "register" ? "Register" : "Login"}</span>
                                                 <ArrowRight size={18} strokeWidth={3} />
                                             </>
                                         )}
@@ -522,13 +522,13 @@ export default function AuthForm() {
                             className="mt-10 px-8 text-center bg-white py-8 rounded-[2.5rem] border border-blue-100 shadow-xl"
                         >
                             <ShieldAlert size={32} className="mx-auto text-orange-500 mb-4" />
-                            <p className="text-blue-900 font-black text-[10px] uppercase tracking-widest mb-6">Security Restriction Enabled</p>
+                            <p className="text-blue-900 font-bold text-sm mb-6">Account Restricted</p>
                             {supportLink && (
                                 <button
                                     onClick={() => window.open(supportLink.startsWith('http') ? supportLink : `https://t.me/${supportLink.replace('@', '')}`, '_blank')}
-                                    className="px-10 py-4 bg-orange-500 text-white rounded-full font-black text-[9px] tracking-widest uppercase hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
+                                    className="px-10 py-4 bg-orange-500 text-white rounded-full font-bold text-sm hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
                                 >
-                                    Engage Support
+                                    Contact Support
                                 </button>
                             )}
                         </motion.div>
