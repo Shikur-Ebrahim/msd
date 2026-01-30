@@ -295,7 +295,7 @@ export default function AuthForm() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="w-full max-w-[480px] min-h-screen md:min-h-0 flex flex-col justify-center relative z-10 px-4 md:px-0"
+                className="w-full max-w-[480px] min-h-screen md:min-h-0 flex flex-col justify-center relative z-10"
             >
                 {/* Main Content Area */}
                 <div className="flex flex-col min-h-[90vh] md:min-h-0">
@@ -325,7 +325,7 @@ export default function AuthForm() {
                         </div>
 
                         {/* Tab Switcher */}
-                        <div className="flex bg-blue-50/50 p-1.5 rounded-[2rem] border border-blue-100/50 mb-10">
+                        <div className="flex bg-blue-50/50 p-1.5 rounded-[2rem] border border-blue-100/50 mb-10 w-full">
                             {(["login", "register"] as const).map((tab) => (
                                 <button
                                     key={tab}
@@ -342,7 +342,7 @@ export default function AuthForm() {
                     </div>
 
                     {/* Form Container */}
-                    <div className="px-8 pb-16">
+                    <div className="px-4 pb-16">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab}
@@ -430,7 +430,7 @@ export default function AuthForm() {
                                                 value={formData.phoneNumber}
                                                 onChange={handleInputChange}
                                                 className="w-full px-5 py-5 bg-transparent outline-none text-blue-900 font-bold placeholder:text-blue-900/40"
-                                                placeholder={activeTab === "login" ? "Email or Phone" : "Phone Number"}
+                                                placeholder="Phone Number"
                                             />
                                         </div>
 
