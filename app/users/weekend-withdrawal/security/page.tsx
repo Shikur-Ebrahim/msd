@@ -24,6 +24,14 @@ import {
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface WeekendOrder {
+    id: string;
+    purchaseDate: any;
+    withdrawalDays?: number;
+    weekendBalance?: number;
+}
+
+
 function SecurityContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -277,10 +285,10 @@ function SecurityContent() {
             const allOrders = ordersSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
-            }));
+            } as WeekendOrder));
 
             // Filter only eligible orders (past waiting period)
-            const eligibleOrders = allOrders.filter((order: any) => {
+            const eligibleOrders = allOrders.filter((order: WeekendOrder) => {
                 const daysPassed = calculateDaysPassed(order.purchaseDate);
                 const withdrawalDays = order.withdrawalDays || 30;
                 const daysLeft = withdrawalDays - daysPassed;
@@ -288,7 +296,7 @@ function SecurityContent() {
             });
 
             // Sort eligible orders by purchase date (oldest first)
-            eligibleOrders.sort((a: any, b: any) => {
+            eligibleOrders.sort((a: WeekendOrder, b: WeekendOrder) => {
                 const dateA = a.purchaseDate?.toDate ? a.purchaseDate.toDate() : new Date(a.purchaseDate);
                 const dateB = b.purchaseDate?.toDate ? b.purchaseDate.toDate() : new Date(b.purchaseDate);
                 return dateA.getTime() - dateB.getTime();
