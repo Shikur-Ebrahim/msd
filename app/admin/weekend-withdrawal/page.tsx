@@ -58,6 +58,10 @@ interface Withdrawal {
         accountNumber?: string;
         holderName?: string;
     };
+    bankName?: string;
+    bankLogoUrl?: string;
+    accountNumber?: string;
+    holderName?: string;
 }
 
 interface WithdrawalCardProps {
@@ -74,9 +78,9 @@ export default function WeekendWithdrawalWalletPage() {
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [verifying, setVerifying] = useState<string | null>(null);
-    const [withdrawals, setWithdrawals] = useState<any[]>([]);
+    const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [confirmAction, setConfirmAction] = useState<{ type: 'verify', data: any } | null>(null);
+    const [confirmAction, setConfirmAction] = useState<{ type: 'verify', data: Withdrawal } | null>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
 
     // Financial Check States
@@ -100,7 +104,7 @@ export default function WeekendWithdrawalWalletPage() {
         );
 
         const unsubscribeWithdrawals = onSnapshot(q, (snapshot) => {
-            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Withdrawal));
             setWithdrawals(data);
         });
 
@@ -110,7 +114,7 @@ export default function WeekendWithdrawalWalletPage() {
         };
     }, [router]);
 
-    const handleVerify = async (withdrawal: any) => {
+    const handleVerify = async (withdrawal: Withdrawal) => {
         if (verifying) return;
         setVerifying(withdrawal.id);
         setConfirmAction(null);
@@ -194,17 +198,37 @@ export default function WeekendWithdrawalWalletPage() {
             const ordersSnap = await getDocs(ordersQ);
             const orders = ordersSnap.docs.map(doc => doc.data());
 
-            // 3. Calculate Product Income
+            // 3. Fetch Weekend Orders (Crucial for weekend withdrawals)
+            const weekendOrdersQ = query(
+                collection(db, "WeekendUserOrders"),
+                where("userId", "==", userId)
+            );
+            const weekendOrdersSnap = await getDocs(weekendOrdersQ);
+            const weekendOrders = weekendOrdersSnap.docs.map(doc => doc.data());
+
+            // 4. Calculate Product Income (including Weekend Products)
             const now = new Date();
             let totalProductEarnings = 0;
+
+            // Standard Orders
             orders.forEach(order => {
                 const purchaseDate = order.purchaseDate?.toDate?.() || new Date(order.purchaseDate);
+                if (isNaN(purchaseDate.getTime())) return;
                 const daysDiff = Math.floor((now.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
                 const productEarnings = (order.dailyIncome || 0) * Math.max(0, daysDiff);
                 totalProductEarnings += productEarnings;
             });
 
-            // 4. Fetch Referral Rates
+            // Weekend Orders
+            weekendOrders.forEach(order => {
+                const purchaseDate = order.purchaseDate?.toDate?.() || new Date(order.purchaseDate);
+                if (isNaN(purchaseDate.getTime())) return;
+                const daysDiff = Math.floor((now.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
+                const productEarnings = (order.dailyIncome || 0) * Math.max(0, daysDiff);
+                totalProductEarnings += productEarnings;
+            });
+
+            // 5. Fetch Referral Rates
             const referralSnap = await getDoc(doc(db, "settings", "referral"));
             const rates = referralSnap.exists() ? referralSnap.data() : { levelA: 12, levelB: 7, levelC: 4, levelD: 2 };
 
@@ -278,11 +302,13 @@ export default function WeekendWithdrawalWalletPage() {
         });
 
         const sortedGroups = Array.from(groupsMap.values())
-            .sort((a: { timestamp: number }, b: { timestamp: number }) => b.timestamp - a.timestamp) // Newest Day First
+            .sort((a, b) => b.timestamp - a.timestamp) // Newest Day First
             .map(group => {
                 const sortedItems = group.items.sort((a: Withdrawal, b: Withdrawal) => {
-                    const timeA = a.createdAt?.seconds ? a.createdAt.seconds : new Date(a.createdAt).getTime() / 1000;
-                    const timeB = b.createdAt?.seconds ? b.createdAt.seconds : new Date(b.createdAt).getTime() / 1000;
+                    const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                    const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                    const timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
+                    const timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
                     return timeA - timeB; // Oldest Item First in group
                 });
 
@@ -293,9 +319,14 @@ export default function WeekendWithdrawalWalletPage() {
                 yesterday.setDate(today.getDate() - 1);
                 yesterday.setHours(0, 0, 0, 0);
 
-                let label = date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-                if (date.getTime() === today.getTime()) label = "Today";
-                else if (date.getTime() === yesterday.getTime()) label = "Yesterday";
+                let label = isNaN(date.getTime())
+                    ? "Unknown Date"
+                    : date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                if (!isNaN(date.getTime())) {
+                    if (date.getTime() === today.getTime()) label = "Today";
+                    else if (date.getTime() === yesterday.getTime()) label = "Yesterday";
+                }
 
                 return { label, items: sortedItems };
             });
@@ -520,7 +551,7 @@ export default function WeekendWithdrawalWalletPage() {
                                     <div className="flex-1 h-[2px] bg-slate-100/50 rounded-full"></div>
                                 </div>
                                 <div className="space-y-6">
-                                    {group.items.map(item => (
+                                    {group.items.map((item: Withdrawal) => (
                                         <WithdrawalCard
                                             key={item.id}
                                             item={item}
@@ -625,8 +656,8 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                         <button
                             onClick={() => {
                                 setIsEditing(false);
-                                setEditedAccountNumber(item.bankDetails?.accountNumber);
-                                setEditedHolderName(item.bankDetails?.holderName);
+                                setEditedAccountNumber(item.bankDetails?.accountNumber || "");
+                                setEditedHolderName(item.bankDetails?.holderName || "");
                             }}
                             className="w-10 h-10 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-lg active:scale-90 transition-all"
                         >
@@ -650,8 +681,12 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
                             <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border shadow-sm
-                                ${isPending ? 'bg-amber-100 text-amber-700 border-amber-300/50' : 'bg-emerald-50 text-emerald-700 border-emerald-200/50'}`}>
-                                {isPending ? '🔴 Weekend Alert' : '🟢 Settled'}
+                                ${isPending
+                                    ? 'bg-amber-100 text-amber-700 border-amber-300/50'
+                                    : item.status === 'verified' || item.status === 'approved'
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50'
+                                        : 'bg-rose-50 text-rose-700 border-rose-200/50'}`}>
+                                {isPending ? '🔴 Weekend Alert' : item.status === 'verified' || item.status === 'approved' ? '🟢 Settled' : '❌ Rejected'}
                             </span>
                         </div>
                         <div className="flex items-baseline gap-1 mt-3">
@@ -723,7 +758,7 @@ function WithdrawalCard({ item, isPending, verifying, setConfirmAction, copyToCl
                         </div>
                     ) : (
                         <button
-                            onClick={() => copyToClipboard(item.bankDetails?.accountNumber, item.id)}
+                            onClick={() => copyToClipboard(item.bankDetails?.accountNumber || "", item.id)}
                             className="w-full bg-slate-900 rounded-[1.8rem] p-6 flex items-center justify-between group overflow-hidden relative shadow-2xl active:scale-95 transition-all"
                         >
                             <span className="text-lg font-mono font-black text-orange-400 tracking-[0.25em] drop-shadow-sm">
