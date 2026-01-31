@@ -48,6 +48,7 @@ export default function UserProductDetailPage() {
     const [isBuying, setIsBuying] = useState(false);
     const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showLimitModal, setShowLimitModal] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -132,7 +133,8 @@ export default function UserProductDetailPage() {
                 });
             });
 
-            setStatusMsg({ type: "success", text: "SUCCESS_PARTNER" });
+            // setStatusMsg({ type: "success", text: "SUCCESS_PARTNER" });
+            setShowConfirmModal(true);
         } catch (error: any) {
             if (!["INSUFFICIENT_FUNDS", "PURCHASE_LIMIT_REACHED", "User profile error"].includes(error.message)) {
                 console.error("System Purchase error:", error);
@@ -158,7 +160,11 @@ export default function UserProductDetailPage() {
             }
 
             let msg = "Transaction Failed";
-            if (error.message === "PURCHASE_LIMIT_REACHED") msg = `Limit reached: ${product.purchaseLimit} items max.`;
+            if (error.message === "PURCHASE_LIMIT_REACHED") {
+                setShowLimitModal(true);
+                return;
+            }
+            // if (error.message === "PURCHASE_LIMIT_REACHED") msg = `Limit reached: ${product.purchaseLimit} items max.`;
             setStatusMsg({ type: "error", text: msg });
         } finally {
             setIsBuying(false);
@@ -315,12 +321,88 @@ export default function UserProductDetailPage() {
                         <Loader2 className="animate-spin" size={20} />
                     ) : (
                         <>
-                            Order Medication
+                            Buy
                             <ArrowRight size={18} strokeWidth={3} />
                         </>
                     )}
                 </button>
             </div>
+
+            {/* Success Modal */}
+            <AnimatePresence>
+                {showConfirmModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600"></div>
+
+                            <div className="flex flex-col items-center text-center space-y-6">
+                                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-2 animate-bounce">
+                                    <CheckCircle2 size={40} className="text-green-500" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Congratulations!</h3>
+                                    <p className="text-sm font-medium text-slate-500 leading-relaxed px-2">
+                                        You have successfully purchased this product. You will receive daily income every day until the contract period ends. Check your earnings daily!
+                                    </p>
+                                </div>
+
+                                <div className="w-full pt-4">
+                                    <button
+                                        onClick={() => router.push("/users/funding-details")}
+                                        className="w-full h-14 bg-slate-900 text-white rounded-2xl font-black tracking-widest uppercase text-xs hover:bg-slate-800 active:scale-95 transition-all shadow-lg shadow-slate-900/20"
+                                    >
+                                        OK
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Limit Reached Modal */}
+            <AnimatePresence>
+                {showLimitModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 via-orange-500 to-red-600"></div>
+
+                            <div className="flex flex-col items-center text-center space-y-6">
+                                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-2 animate-bounce">
+                                    <AlertCircle size={40} className="text-red-500" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Limit Reached</h3>
+                                    <p className="text-sm font-medium text-slate-500 leading-relaxed px-2">
+                                        This product is limited to <span className="text-slate-900 font-bold">{product?.purchaseLimit || 1}</span> unit(s) only. You have already purchased the maximum allowed quantity. Please explore other products.
+                                    </p>
+                                </div>
+
+                                <div className="w-full pt-4">
+                                    <button
+                                        onClick={() => router.push("/users/welcome")}
+                                        className="w-full h-14 bg-slate-900 text-white rounded-2xl font-black tracking-widest uppercase text-xs hover:bg-slate-800 active:scale-95 transition-all shadow-lg shadow-slate-900/20"
+                                    >
+                                        OK
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -336,8 +418,6 @@ const style = `
 }
 `;
 
-if (typeof document !== 'undefined') {
-    const styleSheet = document.createElement("style");
-    styleSheet.innerText = style;
-    document.head.appendChild(styleSheet);
-}
+
+
+

@@ -345,7 +345,7 @@ export default function WeekendUserPage() {
                                                                     : "bg-slate-900 text-white hover:bg-orange-600 shadow-xl shadow-slate-900/10"
                                                                     }`}
                                                             >
-                                                                {isExpired ? "TIME OUT" : "COLLECT NOW"}
+                                                                {isExpired ? "TIME OUT" : "BUY"}
                                                             </button>
                                                         );
                                                     })()

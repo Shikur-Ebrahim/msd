@@ -107,6 +107,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { id: "notifications", label: "Withdrawal Alerts", icon: Bell, path: "/admin/notifications" },
         { id: "products", label: "Products", icon: Package, path: "/admin/product" },
         { id: "weekend-product", label: "Weekend", icon: PartyPopper, path: "/admin/weekend-product" },
+        { id: "weekend-notification", label: "Weekend Alert", icon: Bell, path: "/admin/weekend-notification" },
         { id: "referral", label: "Referral Rule", icon: Percent, path: "/admin/referral-settings" },
         { id: "vip-rules", label: "VIP Rules", icon: Crown, path: "/admin/vip-rules" },
         { id: "vip-notifications", label: "VIP Celebration", icon: PartyPopper, path: "/admin/vip-notifications" },

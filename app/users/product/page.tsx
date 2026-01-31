@@ -277,7 +277,7 @@ export default function UserProductsPage() {
                                                     whileTap={{ scale: 0.98 }}
                                                     className="w-full h-16 bg-orange-500 rounded-[1.5rem] flex items-center justify-center shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all border border-orange-400/20"
                                                 >
-                                                    <span className="text-[12px] font-black text-white tracking-[0.25em] uppercase">Order Now</span>
+                                                    <span className="text-[12px] font-black text-white tracking-[0.25em] uppercase">Buy</span>
                                                 </motion.button>
                                             </div>
                                         </motion.div>

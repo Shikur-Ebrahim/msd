@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import VipCelebrationCard from "@/components/VipCelebrationCard";
+import WeekendNotificationModal from "@/components/WeekendNotificationModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Suspense } from "react";
@@ -51,6 +52,10 @@ function WelcomeContent() {
     // VIP Celebration State
     const [showVipCeleb, setShowVipCeleb] = useState(false);
     const [vipCelebData, setVipCelebData] = useState<any>(null);
+
+    // Weekend Notification State
+    const [showWeekendNotif, setShowWeekendNotif] = useState(false);
+    const [weekendNotifData, setWeekendNotifData] = useState<any>(null);
 
     const searchParams = useSearchParams();
 
@@ -224,6 +229,51 @@ function WelcomeContent() {
             unsubscribeProducts();
         };
     }, [router]);
+
+    // Weekend Notification Logic
+    useEffect(() => {
+        const docRef = doc(db, "SystemSettings", "weekendProductNotification");
+        const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.isEnabled) {
+                    const now = new Date();
+                    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                    const currentDay = days[now.getDay()];
+
+                    if (currentDay === data.targetDay) {
+                        const [targetHour, targetMinute] = (data.targetTime || "00:00").split(":").map(Number);
+                        const currentHour = now.getHours();
+                        const currentMinute = now.getMinutes();
+
+                        // Check if current time is past the target time
+                        if (currentHour > targetHour || (currentHour === targetHour && currentMinute >= targetMinute)) {
+                            const dateKey = now.toDateString();
+                            const countKey = `weekend_notif_count_${dateKey}`;
+                            const currentCount = parseInt(localStorage.getItem(countKey) || "0");
+                            const maxViews = data.maxViews || 1;
+
+                            if (currentCount < maxViews) {
+                                setWeekendNotifData(data);
+                                setShowWeekendNotif(true);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
+    const handleWeekendConfirm = () => {
+        setShowWeekendNotif(false);
+        const now = new Date();
+        const dateKey = now.toDateString();
+        const countKey = `weekend_notif_count_${dateKey}`;
+        const currentCount = parseInt(localStorage.getItem(countKey) || "0");
+        localStorage.setItem(countKey, (currentCount + 1).toString());
+        router.push("/users/weekend");
+    };
 
     // Separate effect for banner interval to avoid redundant subscriptions
     useEffect(() => {
@@ -581,7 +631,7 @@ function WelcomeContent() {
                                                 </div>
 
                                                 <button className="w-full h-14 bg-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/10 text-xs font-black tracking-widest uppercase transition-all hover:bg-orange-600 active:scale-95">
-                                                    Order Now
+                                                    Buy
                                                 </button>
                                             </div>
                                         </motion.div>
@@ -618,6 +668,15 @@ function WelcomeContent() {
                     />
                 )
             }
+
+            {/* Weekend Notification Modal */}
+            {showWeekendNotif && weekendNotifData && (
+                <WeekendNotificationModal
+                    title={weekendNotifData.title}
+                    message={weekendNotifData.message}
+                    onConfirm={handleWeekendConfirm}
+                />
+            )}
         </div >
     );
 }
