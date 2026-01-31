@@ -24,7 +24,6 @@ export default function AuthForm() {
         country: "Ethiopia",
         phonePrefix: "+251",
         phoneNumber: "",
-        fullName: "",
     });
 
     const [supportLink, setSupportLink] = useState<string | null>(null);
@@ -434,19 +433,7 @@ export default function AuthForm() {
                                             />
                                         </div>
 
-                                        {activeTab === "register" && (
-                                            <div className="relative">
-                                                <input
-                                                    type="text"
-                                                    name="fullName"
-                                                    required
-                                                    className="w-full px-5 py-5 rounded-2xl bg-white border border-blue-100 outline-none text-blue-900 font-bold placeholder:text-blue-900/40 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all"
-                                                    placeholder="Full Name"
-                                                    value={formData.fullName}
-                                                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                                />
-                                            </div>
-                                        )}
+
 
                                         <div className="relative">
                                             <input
