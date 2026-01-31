@@ -102,7 +102,6 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { id: "payment-methods", label: "Payment Methods", icon: Banknote, path: "/admin/payment-methods" },
         { id: "currency-rates", label: "Currency Rates", icon: DollarSign, path: "/admin/currency-rates" },
         { id: "withdrawal-banks", label: "Withdrawal Banks", icon: Building2, path: "/admin/withdrawal-banks" },
-        { id: "withdrawal-rules", label: "Withdrawal Rules", icon: BookOpen, path: "/admin/withdrawal-rules" },
         { id: "unlink-account", label: "Unlink Account", icon: UserX, path: "/admin/unlink-account" },
         { id: "notifications", label: "Withdrawal Alerts", icon: Bell, path: "/admin/notifications" },
         { id: "products", label: "Products", icon: Package, path: "/admin/product" },
@@ -112,11 +111,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
         { id: "vip-rules", label: "VIP Rules", icon: Crown, path: "/admin/vip-rules" },
         { id: "vip-notifications", label: "VIP Celebration", icon: PartyPopper, path: "/admin/vip-notifications" },
         { id: "telegram", label: "Telegram Staff", icon: Send, path: "/admin/telegram" },
-        { id: "chats", label: "Live Support", icon: MessageSquare, path: "/admin/chats" },
-        { id: "guidelines", label: "Chat Guidelines", icon: BookOpen, path: "/admin/guidelines" },
-        { id: "rules", label: "Platform Rules", icon: BookOpen, path: "/admin/rules" },
         { id: "platform-notifications", label: "Platform Alerts", icon: Bell, path: "/admin/platform-notifications" },
-        { id: "daily-tasks", label: "Daily Tasks", icon: Gamepad2, path: "/admin/daily-tasks" },
         { id: "team-search", label: "Team Search", icon: Users, path: "/admin/team-search" },
         { id: "users", label: "Users", icon: Users, path: "/admin/users" },
         { id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" },
@@ -169,7 +164,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
                         <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
                             <LayoutDashboard size={20} />
                         </div>
-                        <h1 className="text-xl font-black text-gray-900 tracking-tight">Turner Boss</h1>
+                        <h1 className="text-xl font-black text-gray-900 tracking-tight">MSD</h1>
                     </div>
 
                     <nav className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">

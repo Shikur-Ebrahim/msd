@@ -61,7 +61,7 @@ export default function WeekendProductsPage() {
         purchaseLimit: 1,
         imageUrl: "",
         activeDays: [] as string[],
-        startTime: "00:00",
+        startTime: "08:00",
         endTime: "23:59",
         salesTracker: 80, // Default 80%
         withdrawalDays: 30, // Default 30 days
@@ -571,24 +571,76 @@ export default function WeekendProductsPage() {
 
                                     <div className="grid grid-cols-2 gap-6 pt-4 border-t border-white/5">
                                         <div className="space-y-3">
-                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Start Time</p>
-                                            <input
-                                                type="time"
-                                                name="startTime"
-                                                value={formData.startTime}
-                                                onChange={handleInputChange}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-orange-500/50 font-black text-white"
-                                            />
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Start Time (EAT)</p>
+                                            <div className="flex gap-2">
+                                                <select
+                                                    value={formData.startTime.split(':')[0]}
+                                                    onChange={(e) => {
+                                                        const h = e.target.value;
+                                                        const m = formData.startTime.split(':')[1] || '00';
+                                                        setFormData(prev => ({ ...prev, startTime: `${h}:${m}` }));
+                                                    }}
+                                                    className="w-1/2 px-3 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-orange-500/50 font-black text-white appearance-none text-center"
+                                                >
+                                                    {Array.from({ length: 24 }).map((_, i) => (
+                                                        <option key={i} value={String(i).padStart(2, '0')} className="bg-slate-900">
+                                                            {String(i).padStart(2, '0')}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <span className="text-white/20 font-black self-center">:</span>
+                                                <select
+                                                    value={formData.startTime.split(':')[1]}
+                                                    onChange={(e) => {
+                                                        const m = e.target.value;
+                                                        const h = formData.startTime.split(':')[0] || '00';
+                                                        setFormData(prev => ({ ...prev, startTime: `${h}:${m}` }));
+                                                    }}
+                                                    className="w-1/2 px-3 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-orange-500/50 font-black text-white appearance-none text-center"
+                                                >
+                                                    {Array.from({ length: 60 }).map((_, i) => (
+                                                        <option key={i} value={String(i).padStart(2, '0')} className="bg-slate-900">
+                                                            {String(i).padStart(2, '0')}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         </div>
                                         <div className="space-y-3">
-                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">End Time</p>
-                                            <input
-                                                type="time"
-                                                name="endTime"
-                                                value={formData.endTime}
-                                                onChange={handleInputChange}
-                                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-orange-500/50 font-black text-white"
-                                            />
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">End Time (EAT)</p>
+                                            <div className="flex gap-2">
+                                                <select
+                                                    value={formData.endTime.split(':')[0]}
+                                                    onChange={(e) => {
+                                                        const h = e.target.value;
+                                                        const m = formData.endTime.split(':')[1] || '00';
+                                                        setFormData(prev => ({ ...prev, endTime: `${h}:${m}` }));
+                                                    }}
+                                                    className="w-1/2 px-3 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-orange-500/50 font-black text-white appearance-none text-center"
+                                                >
+                                                    {Array.from({ length: 24 }).map((_, i) => (
+                                                        <option key={i} value={String(i).padStart(2, '0')} className="bg-slate-900">
+                                                            {String(i).padStart(2, '0')}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <span className="text-white/20 font-black self-center">:</span>
+                                                <select
+                                                    value={formData.endTime.split(':')[1]}
+                                                    onChange={(e) => {
+                                                        const m = e.target.value;
+                                                        const h = formData.endTime.split(':')[0] || '00';
+                                                        setFormData(prev => ({ ...prev, endTime: `${h}:${m}` }));
+                                                    }}
+                                                    className="w-1/2 px-3 py-3 bg-white/5 border border-white/10 rounded-xl outline-none focus:border-orange-500/50 font-black text-white appearance-none text-center"
+                                                >
+                                                    {Array.from({ length: 60 }).map((_, i) => (
+                                                        <option key={i} value={String(i).padStart(2, '0')} className="bg-slate-900">
+                                                            {String(i).padStart(2, '0')}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

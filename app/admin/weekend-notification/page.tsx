@@ -22,8 +22,7 @@ export default function WeekendNotificationSettings() {
 
     // Form State
     const [isEnabled, setIsEnabled] = useState(false);
-    const [day, setDay] = useState("Saturday");
-    const [time, setTime] = useState("09:00");
+    const [targetDays, setTargetDays] = useState<string[]>(["Saturday"]);
     const [maxViews, setMaxViews] = useState(1);
     const [title, setTitle] = useState("Weekend Special!");
     const [message, setMessage] = useState("Don't miss out on our exclusive weekend products.");
@@ -37,8 +36,7 @@ export default function WeekendNotificationSettings() {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     setIsEnabled(data.isEnabled ?? false);
-                    setDay(data.targetDay ?? "Saturday");
-                    setTime(data.targetTime ?? "09:00");
+                    setTargetDays(data.targetDays || (data.targetDay ? [data.targetDay] : ["Saturday"]));
                     setMaxViews(data.maxViews ?? 1);
                     setTitle(data.title ?? "Weekend Special!");
                     setMessage(data.message ?? "Don't miss out on our exclusive weekend products.");
@@ -58,8 +56,7 @@ export default function WeekendNotificationSettings() {
         try {
             await setDoc(doc(db, "SystemSettings", "weekendProductNotification"), {
                 isEnabled,
-                targetDay: day,
-                targetTime: time,
+                targetDays, // Array of days
                 maxViews: Number(maxViews),
                 title,
                 message,
@@ -71,6 +68,14 @@ export default function WeekendNotificationSettings() {
             alert("Failed to save settings.");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const toggleDay = (day: string) => {
+        if (targetDays.includes(day)) {
+            setTargetDays(prev => prev.filter(d => d !== day));
+        } else {
+            setTargetDays(prev => [...prev, day]);
         }
     };
 
@@ -125,50 +130,46 @@ export default function WeekendNotificationSettings() {
                         </div>
 
                         {/* Timing Configuration */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="space-y-3">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Calendar size={14} />
-                                    Trigger Day
-                                </label>
-                                <select
-                                    value={day}
-                                    onChange={(e) => setDay(e.target.value)}
-                                    className="w-full h-14 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-bold text-blue-900 transition-all cursor-pointer appearance-none"
-                                >
-                                    {daysOfWeek.map(d => (
-                                        <option key={d} value={d}>{d}</option>
-                                    ))}
-                                </select>
+                        <div className="space-y-4">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                <Calendar size={14} />
+                                Active Days
+                            </label>
+                            <div className="flex flex-wrap gap-3">
+                                {daysOfWeek.map(d => {
+                                    const isActive = targetDays.includes(d);
+                                    return (
+                                        <button
+                                            key={d}
+                                            onClick={() => toggleDay(d)}
+                                            className={`px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                                                : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                                                }`}
+                                        >
+                                            {d.substring(0, 3)}
+                                        </button>
+                                    );
+                                })}
                             </div>
+                            <p className="text-[10px] text-gray-400 font-medium pl-1">
+                                Notification time is automatically synchronized with the earliest product start time for strictly selected days.
+                            </p>
+                        </div>
 
-                            <div className="space-y-3">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Clock size={14} />
-                                    Trigger Time
-                                </label>
-                                <input
-                                    type="time"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                    className="w-full h-14 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-bold text-blue-900 transition-all"
-                                />
-                            </div>
-
-                            <div className="space-y-3">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Eye size={14} />
-                                    Max Views / Day
-                                </label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="10"
-                                    value={maxViews}
-                                    onChange={(e) => setMaxViews(Number(e.target.value))}
-                                    className="w-full h-14 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-bold text-blue-900 transition-all"
-                                />
-                            </div>
+                        <div className="space-y-3">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                <Eye size={14} />
+                                Max Views / Day
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="100"
+                                value={maxViews}
+                                onChange={(e) => setMaxViews(Number(e.target.value))}
+                                className="w-full h-14 px-4 rounded-xl bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-bold text-blue-900 transition-all"
+                            />
                         </div>
 
                         {/* Content Configuration */}

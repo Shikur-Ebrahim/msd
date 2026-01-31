@@ -194,7 +194,7 @@ function AdminDashboard() {
                                 <div className="relative z-10">
                                     <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">Welcome, Admin! ✨</h1>
                                     <p className="text-gray-500 text-lg leading-relaxed max-w-2xl">
-                                        Managing the Turner Construction portal has never been easier. Use the sidebar to update banners, track team stats, or manage partners.
+                                        Managing the MSD portal has never been easier. Use the sidebar to update banners, track team stats, or manage partners.
                                     </p>
                                 </div>
                                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">

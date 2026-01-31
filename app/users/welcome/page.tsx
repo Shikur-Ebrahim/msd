@@ -232,37 +232,90 @@ function WelcomeContent() {
 
     // Weekend Notification Logic
     useEffect(() => {
-        const docRef = doc(db, "SystemSettings", "weekendProductNotification");
-        const unsubscribe = onSnapshot(docRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.isEnabled) {
-                    const now = new Date();
-                    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                    const currentDay = days[now.getDay()];
+        const fetchSettingsAndCheck = async () => {
+            // 1. Get Settings
+            const docRef = doc(db, "SystemSettings", "weekendProductNotification");
+            const docSnap = await getDoc(docRef);
 
-                    if (currentDay === data.targetDay) {
-                        const [targetHour, targetMinute] = (data.targetTime || "00:00").split(":").map(Number);
-                        const currentHour = now.getHours();
-                        const currentMinute = now.getMinutes();
+            if (!docSnap.exists()) return;
 
-                        // Check if current time is past the target time
-                        if (currentHour > targetHour || (currentHour === targetHour && currentMinute >= targetMinute)) {
-                            const dateKey = now.toDateString();
-                            const countKey = `weekend_notif_count_${dateKey}`;
-                            const currentCount = parseInt(localStorage.getItem(countKey) || "0");
-                            const maxViews = data.maxViews || 1;
+            const data = docSnap.data();
+            if (!data.isEnabled) return;
 
-                            if (currentCount < maxViews) {
-                                setWeekendNotifData(data);
-                                setShowWeekendNotif(true);
-                            }
-                        }
+            // 2. Check Day
+            const now = new Date();
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const currentDay = days[now.getDay()];
+
+            // Handle both legacy string day and new array targetDays
+            const activeDays = (data.targetDays || (data.targetDay ? [data.targetDay] : []));
+            if (!activeDays.includes(currentDay)) return;
+
+            // 3. Find Earliest Product Start Time
+            try {
+                // We need products that are active TODAY.
+                // Since "activeDays" is an array on products, we query for that.
+                const q = query(collection(db, "WeekendProducts"), where("activeDays", "array-contains", currentDay));
+                const productsSnap = await getDocs(q);
+
+                if (productsSnap.empty) return;
+
+                let earliestTime = "23:59";
+                productsSnap.forEach(doc => {
+                    const p = doc.data();
+                    if (p.startTime && p.startTime < earliestTime) {
+                        earliestTime = p.startTime;
                     }
+                });
+
+                // 4. Time Check
+                const [targetHour, targetMinute] = earliestTime.split(":").map(Number);
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                const timeInMinutes = currentHour * 60 + currentMinute;
+                const targetInMinutes = targetHour * 60 + targetMinute;
+
+                // Show notification if:
+                // a) It's the first time seeing it today (regardless of time, effectively "Upcoming" alert)
+                // b) OR The time limit has passed (Event Started)
+
+                // User Logic: "automatically set dya but alos after one max notification displayed on just automatically just the weekedn product starting time one "startTime" just reched after one more time notification displayed"
+                // Interpretation:
+                // 1. Show once per day standard.
+                // 2. If time > startTime, maybe show again if we haven't shown "started" alert?
+                // Let's stick to a robust simple logic:
+                // Check Max Views.
+
+                const dateKey = now.toDateString();
+                const countKey = `weekend_notif_count_${dateKey}`;
+                const currentCount = parseInt(localStorage.getItem(countKey) || "0");
+                const maxViews = data.maxViews || 1;
+
+                // If user hasn't seen it today, show it "Upcoming" style or "Now Open" style
+                // If we want to strictly follow "start time reached", we should only show if time >= startTime?
+                // But typically notifications are "Heads up!"
+                // Let's trigger if we haven't exceeded max views.
+
+                if (currentCount < maxViews) {
+                    // Check if we should wait for start time? 
+                    // User said "first time automatically ... but also after one max notification ... just reached after one more time"
+                    // This implies maybe TWO types of notifications.
+                    // For now, let's keep it simple: Show if active day. 
+                    // The Text in the modal can dynamically say "Starts at X" or "Open Now".
+
+                    // Adding a small detail: If time < startTime, we might want to delay showing it?
+                    // Or show it as "Coming Soon".
+
+                    setWeekendNotifData({ ...data, earliestTime });
+                    setShowWeekendNotif(true);
                 }
+
+            } catch (err) {
+                console.error("Error checking weekend products:", err);
             }
-        });
-        return () => unsubscribe();
+        };
+
+        fetchSettingsAndCheck();
     }, []);
 
     const handleWeekendConfirm = () => {
